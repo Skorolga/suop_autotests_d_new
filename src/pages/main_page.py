@@ -1,0 +1,19 @@
+from selenium.webdriver.common.by import By
+from src.pages.basic_page import BasicPage
+
+
+class MainPage(BasicPage):
+    """Класс главной страницы"""
+
+    LK_button = (By.XPATH, '//button[contains(text(),"Личный кабинет")]')  # переход на форму авторизации
+
+
+    def __init__(self, browser, url):
+        super().__init__(browser)
+        self.browser.get(url)
+
+    def auth_main_page(self):
+        """Функция авторизации через главную страницу"""
+        self.click_on_element(self.LK_button)
+
+
