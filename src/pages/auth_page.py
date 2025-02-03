@@ -15,6 +15,7 @@ class Auth(BasicPage):
     # Остальные локаторы
     cab_avatar = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
     logout_profile_menu = (By.XPATH, '//p[contains(text(), "Выход")]')
+    menu_change_role = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
     adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
 
@@ -24,18 +25,22 @@ class Auth(BasicPage):
             self.browser.get(url)
 
     def login(self):
-        """Авторизация пользователя, по умолчанию под ролью администратора"""
+        """Авторизация пользователя под ролью клиента"""
         self.send_text(self.login_form, SUOP.CLIENT_LOGIN)
         self.send_text(self.password_form, SUOP.CLIENT_PASSWORD)
-        self.save_scr('after_send_cred')
         self.click_on_element(self.submit_btn)
-        self.save_scr('after_auth')
         self.select_role(SUOP.ORGANIZATION_CLIENT)
         time.sleep(10)
 
+    def login_as_admin_suop(self):
+        self.click_on_element(self.cab_avatar)
+        self.click_on_element(self.menu_change_role)
+        self.select_role('Администраторы СУ ОП')
+
     def select_role(self, role:str):
-        """Выбирает роль (организацию по названию)"""
-        el_constructor = (By.XPATH, f"//div[contains(text(), '{role}')]")  # f-строка с двойными кавычками, название!
+        """Выбирает роль (организацию) по названию"""
+        el_constructor = (By.XPATH, f"//div[contains(text(), '{role}')]")  # f-строка с двойными кавычками, в названии "!
+        print(el_constructor)
         if self.find_elem(el_constructor):
             self.click_on_element(el_constructor)
 
