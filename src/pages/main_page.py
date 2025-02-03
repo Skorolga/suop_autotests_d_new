@@ -6,6 +6,7 @@ class MainPage(BasicPage):
     """Класс главной страницы"""
 
     LK_button = (By.XPATH, '//button[contains(text(),"Личный кабинет")]')  # переход на форму авторизации
+    showcase_card = (By.XPATH, '//div[contains(@class, "showcase-card")]')  # карусель для проверки загрузки страницы
 
 
     def __init__(self, browser, url):
