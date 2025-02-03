@@ -7,16 +7,16 @@ from config.config import SUOP
 
 class Auth(BasicPage):
     """Класс описывающий авторизацию и выбор роли (организации)"""
+
     login_form = (By.ID, 'username')
     password_form = (By.ID, 'password')
     submit_btn = (By.XPATH, '//button[@type="submit"]')
 
-    # Роль (организации)
-    adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
-
     # Остальные локаторы
     cab_avatar = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
     logout_profile_menu = (By.XPATH, '//p[contains(text(), "Выход")]')
+
+    adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
@@ -30,12 +30,14 @@ class Auth(BasicPage):
         self.save_scr('after_send_cred')
         self.click_on_element(self.submit_btn)
         self.save_scr('after_auth')
-        self.select_role(self.adminSUOP)  # TODO по умолчанию должен быть клиент, т.к. это первая роль УЗ
+        self.select_role(SUOP.ORGANIZATION_CLIENT)
         time.sleep(10)
 
-    def select_role(self, locator):
-        if self.find_elem(locator):
-            self.click_on_element(locator)
+    def select_role(self, role:str):
+        """Выбирает роль (организацию по названию)"""
+        el_constructor = (By.XPATH, f"//div[contains(text(), '{role}')]")  # f-строка с двойными кавычками, название!
+        if self.find_elem(el_constructor):
+            self.click_on_element(el_constructor)
 
     def logout(self):
         self.click_on_element(self.cab_avatar)
