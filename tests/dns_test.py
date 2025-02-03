@@ -9,8 +9,11 @@ def test_dns(browser):
     """Тест DNS СУ ОП"""
     main_page = MainPage(browser, SUOP.MAIN_URL)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
+
+    main_page.wait_for_page_loaded(main_page.showcase_card)
     main_page.save_scr('main_page')
     main_page.auth_main_page()
+    main_page.wait_for_page_loaded(auth_page.submit_btn)
     main_page.save_scr('form_page')
     auth_page.login()
     auth_page.save_scr('Личный кабинет клиент')

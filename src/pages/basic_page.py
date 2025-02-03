@@ -9,7 +9,7 @@ from selenium.common import TimeoutException, NoSuchElementException
 class BasicPage(object):
     """Основной класс для страниц"""
 
-    timeout = 12
+    timeout = 30
 
     def __init__(self, browser):
         self.browser = browser
@@ -42,8 +42,17 @@ class BasicPage(object):
         page_state = self.browser.execute_script('return document.readyState;')
         return page_state == 'complete'
 
+    def wait_for_page_loaded(self, locator=None):
+        WebDriverWait(self.browser, self.timeout).until(
+            lambda b: b.execute_script("return document.readyState") == "complete")
+        if locator:
+            try:
+                WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
+            except TimeoutException:
+                print(f'Время ожидания элемента: {locator} в функции {self.wait_for_page_loaded().__name__}')
+
     def save_scr(self, file_name:str):
-        time.sleep(3)
+        self.wait_for_page_loaded()
         if self.page_has_loaded():
             self.browser.save_screenshot(f'{file_name}.png')
 
