@@ -28,6 +28,7 @@ class BasicPage(object):
             print(f'Элемент {locator[1]} не найден за {self.timeout} секунд')
         except:
             print(f'Не удалось кликнуть по элементу {locator[1]}')
+        return False
 
 
     def click_on_element(self, locator:tuple[str, str]):
@@ -40,9 +41,6 @@ class BasicPage(object):
     def page_has_loaded(self):
         page_state = self.browser.execute_script('return document.readyState;')
         return page_state == 'complete'
-
-    def login_as_client(self):
-        pass
 
     def save_scr(self, file_name:str):
         time.sleep(3)
