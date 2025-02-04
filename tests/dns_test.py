@@ -18,5 +18,6 @@ def test_dns(browser):
     auth_page.login()
     auth_page.save_scr('Личный кабинет клиент')
     auth_page.login_as_admin_suop()
+    auth_page.wait_for_page_loaded(auth_page.profile_name)
     auth_page.save_scr('Личный кабинет Администратор СУОП')
     auth_page.logout()
