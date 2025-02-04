@@ -18,6 +18,7 @@ class Auth(BasicPage):
     menu_change_role = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
     adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
+    profile_name = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
@@ -30,7 +31,6 @@ class Auth(BasicPage):
         self.send_text(self.password_form, SUOP.CLIENT_PASSWORD)
         self.click_on_element(self.submit_btn)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
-        time.sleep(10)
 
     def login_as_admin_suop(self):
         self.click_on_element(self.cab_avatar)
