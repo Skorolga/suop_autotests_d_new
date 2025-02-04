@@ -18,7 +18,8 @@ class Auth(BasicPage):
     menu_change_role = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
     adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
-    profile_name = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
+    profile_name_admin = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
+    profile_name_client = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Администратор СУ ОП
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
