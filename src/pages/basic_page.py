@@ -26,8 +26,8 @@ class BasicPage(object):
             return element
         except TimeoutException:
             print(f'Элемент {locator[1]} не найден за {self.timeout} секунд')
-        except:
-            print(f'Не удалось кликнуть по элементу {locator[1]}')
+        except Exception as error:
+            print(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
         return False
 
 
