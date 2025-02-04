@@ -1,6 +1,7 @@
 .venv/
 .idea/
 allure-results/
+allure-report/
 __pycache__/
 .env
 *.png
