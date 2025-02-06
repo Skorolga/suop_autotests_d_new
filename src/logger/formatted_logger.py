@@ -36,7 +36,7 @@ class FormattedLogger:
 
 logger = FormattedLogger()  # готовим и в дальнейшем его импортируем в коде
 
-
+# Тестовый вывод
 if __name__ == '__main__':
     logger.debug('debug message', True)
     logger.info('info message', True)
