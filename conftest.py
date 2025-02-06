@@ -1,3 +1,5 @@
+from datetime import datetime
+import subprocess
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -18,3 +20,10 @@ def browser():
 
     yield browser
     browser.quit()
+
+
+@pytest.hookimpl()
+def pytest_sessionfinish(session, exitstatus):
+    file_name = f'{session.items[0].name}_{datetime.now().strftime("%d.%m.%Y_%H.%M.%S")}'
+    cmd = f'allure generate -c ./allure-results --single-file -o ./allure-report/{file_name}'
+    subprocess.Popen(cmd, shell=True, universal_newlines=True, stdout=subprocess.PIPE, text=True)
