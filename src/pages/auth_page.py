@@ -41,7 +41,6 @@ class Auth(BasicPage):
     def select_role(self, role:str):
         """Выбирает роль (организацию) по названию"""
         el_constructor = (By.XPATH, f"//div[contains(text(), '{role}')]")  # f-строка с двойными кавычками, в названии "!
-        print(el_constructor)
         if self.find_elem(el_constructor):
             self.click_on_element(el_constructor)
 

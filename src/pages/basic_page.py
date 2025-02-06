@@ -4,6 +4,7 @@ from selenium.webdriver.support.expected_conditions import element_to_be_clickab
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import TimeoutException, NoSuchElementException
+from src.logger.formatted_logger import logger
 
 
 class BasicPage(object):
@@ -20,14 +21,14 @@ class BasicPage(object):
         try:
             element = WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
         except NoSuchElementException:
-            print(f'Элемент {locator[1]} не найден')
+            logger.warning(f'Элемент {locator[1]} не найден')
         try:
             element = WebDriverWait(self.browser, self.timeout).until(EC.element_to_be_clickable(locator))
             return element
         except TimeoutException:
-            print(f'Элемент {locator[1]} не найден за {self.timeout} секунд')
+            logger.warning(f'Элемент {locator[1]} не найден за {self.timeout} секунд')
         except Exception as error:
-            print(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
+            logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
         return False
 
 
@@ -35,7 +36,7 @@ class BasicPage(object):
         element = self.find_elem(locator)
         if element:
             element.click()
-            print(f'Клик по элементу: {locator[1]}')
+            logger.info(f'Клик по элементу: {locator[1]}')
 
 
     def page_has_loaded(self):
@@ -49,7 +50,7 @@ class BasicPage(object):
             try:
                 WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
             except TimeoutException:
-                print(f'Время ожидания элемента: {locator} в функции {self.wait_for_page_loaded().__name__}')
+                logger.warning(f'Время ожидания элемента: {locator} в функции {self.wait_for_page_loaded().__name__}')
 
     def save_scr(self, file_name:str):
         self.wait_for_page_loaded()
