@@ -18,11 +18,12 @@ def pre_post_dns(browser):
 def test_dns(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
 
-    main_page = MainPage(browser, SUOP.MAIN_URL)  # экземпляр главной страницы с url
+    main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
     print('Управление DNS. Добавление домена')
     with allure.step('Открываем главную страницу'):
         logger.info('Открываем главную страницу')
+        main_page.go_to(SUOP.MAIN_URL)
         main_page.wait_for_page_loaded(main_page.showcase_card)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),

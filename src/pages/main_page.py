@@ -9,9 +9,13 @@ class MainPage(BasicPage):
     showcase_card = (By.XPATH, '//div[contains(@class, "showcase-card")]')  # карусель для проверки загрузки страницы
 
 
-    def __init__(self, browser, url):
+    def __init__(self, browser, url=None):
         super().__init__(browser)
-        self.browser.get(url)
+        if url:
+            self.browser.get(url)
+
+    def go_to(self, set_url):
+        self.browser.get(set_url)
 
     def auth_main_page(self):
         """Функция авторизации через главную страницу"""
