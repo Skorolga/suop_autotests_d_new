@@ -20,7 +20,6 @@ def test_dns(pre_post_dns, browser):
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
-    print('Управление DNS. Добавление домена')
     with allure.step('Открываем главную страницу'):
         logger.info('Открываем главную страницу')
         main_page.go_to(SUOP.MAIN_URL)
