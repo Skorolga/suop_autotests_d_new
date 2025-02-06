@@ -1,10 +1,10 @@
-import time
 import allure
 from allure_commons.types import AttachmentType
 import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import Auth
 from config.config import SUOP
+from src.logger.formatted_logger import logger
 
 @pytest.fixture
 def pre_post_dns(browser):
@@ -17,10 +17,12 @@ def pre_post_dns(browser):
 @allure.story('Управление DNS. Добавление домена.')
 def test_dns(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
+
     main_page = MainPage(browser, SUOP.MAIN_URL)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
-
+    print('Управление DNS. Добавление домена')
     with allure.step('Открываем главную страницу'):
+        logger.info('Открываем главную страницу')
         main_page.wait_for_page_loaded(main_page.showcase_card)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
