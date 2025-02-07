@@ -1,3 +1,4 @@
+import time
 import allure
 from allure_commons.types import AttachmentType
 import pytest
@@ -43,6 +44,27 @@ def test_dns(pre_post_dns, browser):
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Личный_кабинет_клиента',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Создание заказа'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        client_page.make_order()
+        client_page.wait_for_page_loaded(client_page.FORM_TITLE_CONF)
+        order_cost_without_tax = client_page.find_elem(client_page.COST_WITHOUT_TAX)
+        logger.info(order_cost_without_tax.text)
+        while True:
+            logger.info(order_cost_without_tax.text.strip())
+            if order_cost_without_tax.text.strip() == '':
+                continue
+            cost = float(order_cost_without_tax.text.strip())
+            if cost > 0:
+                break
+            time.sleep(0.5)
+        allure.attach(
+            body=main_page.browser.get_screenshot_as_png(),
+            name='Страница с формой для создания заказа',
             attachment_type=AttachmentType.PNG
         )
 
