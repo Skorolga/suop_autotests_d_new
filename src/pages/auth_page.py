@@ -1,50 +1,63 @@
 import time
-
+import allure
+from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
 from src.pages.basic_page import BasicPage
+from src.pages.main_page import MainPage
 from config.config import SUOP
 
 
 class Auth(BasicPage):
     """Класс описывающий авторизацию и выбор роли (организации)"""
 
-    login_form = (By.ID, 'username')
-    password_form = (By.ID, 'password')
-    submit_btn = (By.XPATH, '//button[@type="submit"]')
+    # Форма авторизации
+    LOGIN_FORM = (By.ID, 'username')
+    PASSWORD_FORM = (By.ID, 'password')
+    SUBMIT_BTN = (By.XPATH, '//button[@type="submit"]')
 
     # Остальные локаторы
-    cab_avatar = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
-    logout_profile_menu = (By.XPATH, '//p[contains(text(), "Выход")]')
-    menu_change_role = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
+    CAB_AVATAR = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
+    LOGOUT_PROFILE_MENU = (By.XPATH, '//p[contains(text(), "Выход")]')
+    MENU_CHANGE_ROLE = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
-    adminSUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
-    profile_name_admin = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
-    profile_name_client = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Администратор СУ ОП
+    ADMIN_SUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
+    PROFILE_NAME_ADMIN = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
+    PROFILE_NAME_CLIENT = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Администратор СУ ОП
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
         if url:
             self.browser.get(url)
 
-    def login(self):
-        """Авторизация пользователя под ролью клиента"""
-        self.send_text(self.login_form, SUOP.CLIENT_LOGIN)
-        self.send_text(self.password_form, SUOP.CLIENT_PASSWORD)
-        self.click_on_element(self.submit_btn)
+    def auth_as_client(self):
+        """Авторизация под ролью клиента"""
+        self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
+        self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
+        self.send_text(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Форма_авторизации',
+            attachment_type=AttachmentType.PNG
+        )
+        self.click_on_element(self.SUBMIT_BTN)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
 
-    def login_as_admin_suop(self):
-        self.click_on_element(self.cab_avatar)
-        self.click_on_element(self.menu_change_role)
+    def relogin_as_admin_suop(self, first_auth=False):
+        """Авторизация под ролью Администратора"""
+        if not first_auth:
+            # Если это не первая авторизация сначала переходим на страницу выбора организации
+            self.click_on_element(self.CAB_AVATAR)
+            self.click_on_element(self.MENU_CHANGE_ROLE)
+
         self.select_role('Администраторы СУ ОП')
 
     def select_role(self, role:str):
         """Выбирает роль (организацию) по названию"""
-        el_constructor = (By.XPATH, f"//div[contains(text(), '{role}')]")  # f-строка с двойными кавычками, в названии "!
+        el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
         if self.find_elem(el_constructor):
             self.click_on_element(el_constructor)
 
     def logout(self):
-        self.click_on_element(self.cab_avatar)
-        self.click_on_element(self.logout_profile_menu)
-
+        """Выход из учетной записи"""
+        self.click_on_element(self.CAB_AVATAR)
+        self.click_on_element(self.LOGOUT_PROFILE_MENU)
