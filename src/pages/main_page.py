@@ -3,10 +3,10 @@ from src.pages.basic_page import BasicPage
 
 
 class MainPage(BasicPage):
-    """Класс главной страницы"""
+    """Класс главной страницы СУ ОП"""
 
-    LK_button = (By.XPATH, '//button[contains(text(),"Личный кабинет")]')  # переход на форму авторизации
-    showcase_card = (By.XPATH, '//div[contains(@class, "showcase-card")]')  # карусель для проверки загрузки страницы
+    LK_BUTTON = (By.XPATH, '//button[contains(text(),"Личный кабинет")]')  # переход на форму авторизации
+    SHOWCASE_CARD = (By.XPATH, '//div[contains(@class, "showcase-card")]')  # карусель для проверки загрузки страницы
 
 
     def __init__(self, browser, url=None):
@@ -19,6 +19,6 @@ class MainPage(BasicPage):
 
     def auth_main_page(self):
         """Функция авторизации через главную страницу"""
-        self.click_on_element(self.LK_button)
+        self.click_on_element(self.LK_BUTTON)
 
 

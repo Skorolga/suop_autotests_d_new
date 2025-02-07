@@ -3,6 +3,7 @@ from allure_commons.types import AttachmentType
 import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import Auth
+from src.pages.client_page import ClientPage
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 
@@ -20,35 +21,36 @@ def test_dns(pre_post_dns, browser):
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
-    with allure.step('Открываем главную страницу'):
-        logger.info('Открываем главную страницу')
+    client_page = ClientPage(browser)
+
+    step_name = 'Открываем главную страницу'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
         main_page.go_to(SUOP.MAIN_URL)
-        main_page.wait_for_page_loaded(main_page.showcase_card)
+        main_page.wait_for_page_loaded(main_page.SHOWCASE_CARD)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Главня_страница',
             attachment_type=AttachmentType.PNG
         )
 
-    with allure.step('Личный кабинет клиента'):
-        main_page.auth_main_page()
-        main_page.wait_for_page_loaded(auth_page.submit_btn)
-        allure.attach(
-            body=main_page.browser.get_screenshot_as_png(),
-            name='Форма_авторизации',
-            attachment_type=AttachmentType.PNG
-        )
-        auth_page.login()
-        main_page.wait_for_page_loaded(auth_page.profile_name_client)
+    step_name = 'Личный кабинет клиента'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.auth_as_client()
+        main_page.wait_for_page_loaded(auth_page.PROFILE_NAME_CLIENT)  # Ожидание появление элемента
+        client_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
 
-    with allure.step('Личный кабинет администратора'):
-        auth_page.login_as_admin_suop()
-        auth_page.wait_for_page_loaded(auth_page.profile_name_admin)
+    step_name = 'Личный кабинет администратора'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.relogin_as_admin_suop()
+        auth_page.wait_for_page_loaded(auth_page.PROFILE_NAME_ADMIN)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Личный_кабинет_Администратор_СУОП',
