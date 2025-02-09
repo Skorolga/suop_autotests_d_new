@@ -1,7 +1,9 @@
+import time
+from datetime import datetime
 from selenium.webdriver.common.by import By
 from src.pages.basic_page import BasicPage
-
 from src.logger.formatted_logger import logger
+
 
 class ClientPage(BasicPage):
     """Класс описывает страницу клиента"""
@@ -26,3 +28,22 @@ class ClientPage(BasicPage):
         self.click_on_element(self.BANNER_MAKE_ORDER)
         self.click_on_element(self.BUTTON_MAKE_ORDER)
 
+    def check_cost(self, cost_locator, timeout=10) -> float|bool:
+        """Проверяет наличие суммы > 0 по локатору"""
+        start_time = datetime.now()
+        while True:
+            # Вычисляем разницу между двумя датами
+            time_difference = datetime.now() - start_time
+            if time_difference.total_seconds() > timeout:
+                logger.error('timeout при поиске и проверке начисления стоимости заказа без НДС')
+                return False
+
+            order_cost_without_tax = self.find_elem(cost_locator)
+            # logger.info(order_cost_without_tax.text)
+            # logger.info(order_cost_without_tax.text.strip())
+            if order_cost_without_tax.text.strip() == '':  # пропускаем при отсутствии строки, во время загрузки данных
+                continue
+            cost = float(order_cost_without_tax.text.strip())
+            if cost > 0:
+                return cost
+            time.sleep(0.5)

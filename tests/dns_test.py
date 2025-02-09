@@ -52,16 +52,10 @@ def test_dns(pre_post_dns, browser):
         logger.info('Шаг: ' + step_name)
         client_page.make_order()
         client_page.wait_for_page_loaded(client_page.FORM_TITLE_CONF)
-        order_cost_without_tax = client_page.find_elem(client_page.COST_WITHOUT_TAX)
-        logger.info(order_cost_without_tax.text)
-        while True:
-            logger.info(order_cost_without_tax.text.strip())
-            if order_cost_without_tax.text.strip() == '':
-                continue
-            cost = float(order_cost_without_tax.text.strip())
-            if cost > 0:
-                break
-            time.sleep(0.5)
+        cost = client_page.check_cost(client_page.COST_WITHOUT_TAX)
+        logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
+        assert cost, f'Ошибка в начислении суммы заказа по локатору {client_page.COST_WITHOUT_TAX}'
+
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Страница с формой для создания заказа',
