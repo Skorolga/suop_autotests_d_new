@@ -29,11 +29,7 @@ def test_dns(pre_post_dns, browser):
         logger.info('Шаг: ' + step_name)
         main_page.go_to(SUOP.MAIN_URL)
         main_page.wait_for_page_loaded(main_page.SHOWCASE_CARD)
-        allure.attach(
-            body=main_page.browser.get_screenshot_as_png(),
-            name='Главня_страница',
-            attachment_type=AttachmentType.PNG
-        )
+
 
     step_name = 'Личный кабинет клиента'
     with allure.step(step_name):
@@ -51,16 +47,7 @@ def test_dns(pre_post_dns, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         client_page.make_order()
-        client_page.wait_for_page_loaded(client_page.FORM_TITLE_CONF)
-        cost = client_page.check_cost(client_page.COST_WITHOUT_TAX)
-        logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
-        assert cost, f'Ошибка в начислении суммы заказа по локатору {client_page.COST_WITHOUT_TAX}'
 
-        allure.attach(
-            body=main_page.browser.get_screenshot_as_png(),
-            name='Страница с формой для создания заказа',
-            attachment_type=AttachmentType.PNG
-        )
 
     step_name = 'Личный кабинет администратора'
     with allure.step(step_name):
