@@ -18,7 +18,7 @@ def browser():
     options.set_capability('unhandledPromptBehavior', 'ignore')
 
     browser = webdriver.Chrome(options=options)
-    browser.implicitly_wait(20)  # неявное ожидание
+    # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным не использовать)
 
     yield browser
     browser.quit()

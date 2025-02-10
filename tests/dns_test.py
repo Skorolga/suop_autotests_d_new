@@ -1,4 +1,6 @@
 import time
+from asyncio import timeout
+
 import allure
 from allure_commons.types import AttachmentType
 import pytest
@@ -11,8 +13,7 @@ from src.logger.formatted_logger import logger
 @pytest.fixture
 def pre_post_dns(browser):
     yield
-    auth_page = Auth(browser)
-    auth_page.logout()
+    browser.get(SUOP.MAIN_URL + '/logout')
 
 @allure.tag('dns')
 @allure.testcase('https://jira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
@@ -48,6 +49,16 @@ def test_dns(pre_post_dns, browser):
         logger.info('Шаг: ' + step_name)
         client_page.make_order()
 
+    step_name = 'Авторизация за менеджера'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.relogin_as_manager()
+        time.sleep(5)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Manager',
+            attachment_type=AttachmentType.PNG
+        )
 
     step_name = 'Личный кабинет администратора'
     with allure.step(step_name):

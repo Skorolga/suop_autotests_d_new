@@ -15,6 +15,9 @@ class Auth(BasicPage):
     PASSWORD_FORM = (By.ID, 'password')
     SUBMIT_BTN = (By.XPATH, '//button[@type="submit"]')
 
+    # Модальное окно выбора организации
+    AUTH_MODAL_PAGINATION_NEXT = (By.XPATH, '//li[@class="pagination__next"]')
+
     # Остальные локаторы
     CAB_AVATAR = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
     LOGOUT_PROFILE_MENU = (By.XPATH, '//p[contains(text(), "Выход")]')
@@ -32,6 +35,7 @@ class Auth(BasicPage):
     def auth_as_client(self):
         """Авторизация под ролью клиента"""
         self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
+        self.wait_for_page_loaded(self.LOGIN_FORM)
         self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
         self.send_text(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
         allure.attach(
@@ -51,10 +55,21 @@ class Auth(BasicPage):
 
         self.select_role('Администраторы СУ ОП')
 
+    def relogin_as_manager(self, first_auth=False):
+        """Авторизация под ролью ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами"""
+        if not first_auth:
+            # Если это не первая авторизация сначала переходим на страницу выбора организации
+            self.click_on_element(self.CAB_AVATAR)
+            self.click_on_element(self.MENU_CHANGE_ROLE)
+        self.select_role('ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами')
+
     def select_role(self, role:str):
         """Выбирает роль (организацию) по названию"""
         el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
-        if self.find_elem(el_constructor):
+        if self.find_elem(el_constructor, 5):
+            self.click_on_element(el_constructor, 5)
+        else:
+            self.click_on_element(self.AUTH_MODAL_PAGINATION_NEXT)
             self.click_on_element(el_constructor)
 
     def logout(self):
