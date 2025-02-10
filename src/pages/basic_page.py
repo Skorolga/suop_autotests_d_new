@@ -17,37 +17,41 @@ class BasicPage(object):
     def __init__(self, browser):
         self.browser = browser
 
-    def find_elem(self, locator:tuple[str, str]) -> WebElement | bool:
+    def find_elem(self, locator:tuple[str, str], timeout=timeout) -> WebElement | bool:
         """Поиск элемента по локатору, возвращает элемент или bool"""
         element = None
-
         # Проверяем наличие элемента на странице
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
+            element = WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
         except NoSuchElementException:
             logger.warning(f'Элемент {locator[1]} не найден')
+            return False
+        except TimeoutException:
+            logger.warning(f'Элемент {locator[1]} не найден за {timeout} секунд')
             return False
 
         # Проверка кликабельности элемента
         try:
-            element = WebDriverWait(self.browser, self.timeout).until(EC.element_to_be_clickable(locator))
+            element = WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable(locator))
         except TimeoutException:
-            logger.warning(f'Элемент {locator[1]} не найден за {self.timeout} секунд')
+            logger.warning(f'Элемент {locator[1]} не найден за {timeout} секунд')
         except Exception as error:
             logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
             return False
 
-        logger.info(f'Скроллим до элемента: {locator[1]}')
-        action = ActionChains(self.browser)
-        action.move_to_element_with_offset(element, 0, 0).pause(0).perform()
+
         if element:
+            logger.info(f'Скроллим до элемента: {locator[1]}')
+            action = ActionChains(self.browser)
+            action.move_to_element_with_offset(element, 0, 0).pause(0).perform()
             return element
         else:
             return False
 
 
-    def click_on_element(self, locator:tuple[str, str]):
-        element = self.find_elem(locator)
+    def click_on_element(self, locator:tuple[str, str], timeout=timeout):
+        logger.info(f'click_on_element timeout {timeout}')
+        element = self.find_elem(locator, timeout)
         if element:
             element.click()
             logger.info(f'Клик по элементу: {locator[1]}')
