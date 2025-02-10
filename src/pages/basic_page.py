@@ -64,7 +64,7 @@ class BasicPage(object):
             try:
                 WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
             except TimeoutException:
-                logger.warning(f'Время ожидания элемента: {locator} в функции {self.wait_for_page_loaded().__name__}')
+                logger.warning(f'Время ожидания элемента: {locator} в функции basic_page.wait_for_page_loaded()')
 
     def save_scr(self, file_name:str):
         self.wait_for_page_loaded()
