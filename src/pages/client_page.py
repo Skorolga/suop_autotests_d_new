@@ -52,12 +52,17 @@ class ClientPage(BasicPage):
             if time_difference.total_seconds() > 180:
                 logger.error('timeout при создании заказа')
                 return False
-            num_element = self.find_elem(self.NEW_ORDER_NUM).text
-            num_element = ''.join([symb for symb in num_element if symb.isdigit()])
-            if int(num_element) > 0:
-                logger.info(f'Создан заказ № {num_element}')
+            order_num = self.find_elem(self.NEW_ORDER_NUM).text
+            order_num = ''.join([symb for symb in order_num if symb.isdigit()])
+            if int(order_num) > 0:
+                logger.info(f'Создан заказ № {order_num}')
                 break
             time.sleep(0.5)
+        allure.attach(
+            body=str(order_num),
+            name="Номер созданного заказа",
+            attachment_type=AttachmentType.TEXT,
+        )
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Номер созданного заказа',
