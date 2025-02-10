@@ -9,6 +9,7 @@ from selenium.webdriver.chrome.options import Options
 def browser():
     options = Options()
     options.add_argument("--ignore-ssl-errors=yes")
+    options.add_argument("--disable-notifications")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--start-maximized")
     options.add_argument("--lang= ru")
