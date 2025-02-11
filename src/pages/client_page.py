@@ -20,7 +20,7 @@ class ClientPage(BasicPage):
     COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')
     SUBMIT_BUTTON = (By.XPATH, '//button[@type="submit"]')  # Кнопка заказать
     NEW_ORDER_NUM = (By.XPATH, "//p[contains(text(), '№')]")  # локатор модального окна с номером созданного заказа
-    GO_TO_ORDER = (By.XPATH, "//button[contains(text(), 'К заказу')]")
+    GO_TO_ORDER = (By.XPATH, "//button[contains(text(), 'К заказу')]")  # Кнопка для перехода к заказу из модального окна при создании нового заказа
     VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # заголовок в заказе для ожидания загрузки страницы
 
     def __init__(self, browser):
