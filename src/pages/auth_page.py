@@ -69,6 +69,7 @@ class Auth(BasicPage):
         if self.find_elem(el_constructor, 5):
             self.click_on_element(el_constructor, 5)
         else:
+            # TODO доделать перебор пагинации (лучше когда снимут ограничение в 2 сессии)
             self.click_on_element(self.AUTH_MODAL_PAGINATION_NEXT)
             self.click_on_element(el_constructor)
 
