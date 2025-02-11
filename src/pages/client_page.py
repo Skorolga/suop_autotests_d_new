@@ -26,8 +26,8 @@ class ClientPage(BasicPage):
     def __init__(self, browser):
         super().__init__(browser)
 
-    def make_order(self):
-        """Метод создает заказ Публичное облако под уже авторизованным клиентом"""
+    def make_order(self, timeout=180) -> str:
+        """Метод создает заказ Публичное облако под уже авторизованным клиентом и возвращает номер заказа"""
         logger.info('Создание заказа Публичное облако за клиента')
         self.click_on_element(self.MENU_MAKE_ORDER)
         self.wait_for_page_loaded(self.BANNER_MAKE_ORDER)
@@ -49,7 +49,7 @@ class ClientPage(BasicPage):
         start_time = datetime.now()
         while True:
             time_difference = datetime.now() - start_time
-            if time_difference.total_seconds() > 180:
+            if time_difference.total_seconds() > timeout:
                 logger.error('timeout при создании заказа')
                 return False
             order_num = self.find_elem(self.NEW_ORDER_NUM).text
@@ -75,6 +75,7 @@ class ClientPage(BasicPage):
             name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
+        return order_num
 
     def check_cost(self, cost_locator, timeout=10) -> float|bool:
         """Проверяет наличие суммы > 0 по локатору"""

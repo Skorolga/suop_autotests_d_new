@@ -12,8 +12,9 @@ from src.logger.formatted_logger import logger
 
 @pytest.fixture
 def pre_post_dns(browser):
+    """TODO вынести в отдельную фикстуру, в conftest.py"""
     yield
-    browser.get(SUOP.MAIN_URL + '/logout')
+    browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
 
 @allure.tag('dns')
 @allure.testcase('https://jira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
@@ -31,7 +32,6 @@ def test_dns(pre_post_dns, browser):
         main_page.go_to(SUOP.MAIN_URL)
         main_page.wait_for_page_loaded(main_page.SHOWCASE_CARD)
 
-
     step_name = 'Личный кабинет клиента'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
@@ -47,7 +47,8 @@ def test_dns(pre_post_dns, browser):
     step_name = 'Создание заказа'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        client_page.make_order()
+        order_num = client_page.make_order()
+        logger.info(f'Создан и получен номер заказа №:{order_num}')
 
     step_name = 'Авторизация за менеджера'
     with allure.step(step_name):
