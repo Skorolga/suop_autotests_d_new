@@ -54,7 +54,7 @@ def test_dns(pre_post_dns, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_manager()
-        time.sleep(5)
+        auth_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Manager',
