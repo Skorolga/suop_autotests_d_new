@@ -32,7 +32,8 @@ class BasicPage(object):
 
         # Проверка кликабельности элемента
         try:
-            element = WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable(locator))
+            WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable(locator))
+            # return element
         except TimeoutException:
             logger.warning(f'Элемент {locator[1]} не найден за {timeout} секунд')
         except Exception as error:
@@ -43,7 +44,7 @@ class BasicPage(object):
         if element:
             logger.info(f'Скроллим до элемента: {locator[1]}')
             action = ActionChains(self.browser)
-            action.move_to_element_with_offset(element, 0, 0).pause(0).perform()
+            action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
             return element
         else:
             return False
@@ -61,12 +62,12 @@ class BasicPage(object):
         page_state = self.browser.execute_script('return document.readyState;')
         return page_state == 'complete'
 
-    def wait_for_page_loaded(self, locator=None):
+    def wait_for_page_loaded(self, locator=None, timeout=timeout):
         WebDriverWait(self.browser, self.timeout).until(
             lambda b: b.execute_script("return document.readyState") == "complete")
         if locator:
             try:
-                WebDriverWait(self.browser, self.timeout).until(EC.presence_of_element_located(locator))
+                WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
             except TimeoutException:
                 logger.warning(f'Время ожидания элемента: {locator} в функции basic_page.wait_for_page_loaded()')
 

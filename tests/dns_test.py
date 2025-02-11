@@ -7,6 +7,7 @@ import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import Auth
 from src.pages.client_page import ClientPage
+from src.pages.orders_page import OrdersPage
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 
@@ -25,6 +26,7 @@ def test_dns(pre_post_dns, browser):
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = Auth(browser)
     client_page = ClientPage(browser)
+    orders_page = OrdersPage(browser)
 
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
@@ -60,6 +62,42 @@ def test_dns(pre_post_dns, browser):
             name='Manager',
             attachment_type=AttachmentType.PNG
         )
+
+    step_name = 'Согласование созданного заказа за менеджера'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        # auth_page.relogin_as_manager()
+        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Список заказов',
+            attachment_type=AttachmentType.PNG
+        )
+        orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
+        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Список заказов после очистки фильтра поиска',
+            attachment_type=AttachmentType.PNG
+        )
+
+        orders_page.find_order(order_num)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Найденный заказ',
+            attachment_type=AttachmentType.PNG
+        )
+
+        orders_page.approve_order(order_num)
+        # orders_page.del_order(order_num)
+
+        time.sleep(30)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Согласование заказа',
+            attachment_type=AttachmentType.PNG
+        )
+
 
     step_name = 'Личный кабинет администратора'
     with allure.step(step_name):
