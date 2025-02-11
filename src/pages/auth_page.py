@@ -1,4 +1,3 @@
-import time
 import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
@@ -17,6 +16,7 @@ class Auth(BasicPage):
 
     # Модальное окно выбора организации
     AUTH_MODAL_PAGINATION_NEXT = (By.XPATH, '//li[@class="pagination__next"]')
+    AUTH_MODAL_MAIN_TABLE = (By.XPATH, '//table/tbody[contains(@class, "table-body")]')  # для ожидания загрузки
 
     # Остальные локаторы
     CAB_AVATAR = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
@@ -66,8 +66,9 @@ class Auth(BasicPage):
     def select_role(self, role:str):
         """Выбирает роль (организацию) по названию"""
         el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
-        if self.find_elem(el_constructor, 5):
-            self.click_on_element(el_constructor, 5)
+        self.wait_for_page_loaded(self.AUTH_MODAL_MAIN_TABLE)
+        if self.find_elem(el_constructor, 2):
+            self.click_on_element(el_constructor, 2)
         else:
             # TODO доделать перебор пагинации (лучше когда снимут ограничение в 2 сессии)
             self.click_on_element(self.AUTH_MODAL_PAGINATION_NEXT)
