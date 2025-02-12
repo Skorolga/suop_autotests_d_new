@@ -4,6 +4,7 @@ import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
 from src.pages.basic_page import BasicPage
+from src.pages.client_page import ClientPage
 from src.logger.formatted_logger import logger
 
 
@@ -37,10 +38,11 @@ class OrdersPage(BasicPage):
 
     def find_order(self, num_order):
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
+        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
         self.send_text(self.FILTER_INPUT_ID_ORDER, num_order)
         self.click_on_element(self.FILTER_FORM_APPLY_BUTTON)
-        self.wait_for_page_loaded(self.ORDER_BUTTON_APPROVE_MANAGER)
+        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
 
     def clean_filter_for_find_orders(self):
         """Очистка параметров фильтра поиска страницы с заказами"""
@@ -58,7 +60,7 @@ class OrdersPage(BasicPage):
         self.browser.refresh()
         self.wait_for_page_loaded(self.ORDER_STATUS_STOPPED, 540)
         self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_DELETE)
+        self.wait_for_page_loaded(self.ORDER_DELETE, 540)
         self.click_on_element(self.ORDER_DELETE)
         self.click_on_element(self.ORDER_DELETE_MODAL_YES)
         self.browser.refresh()
@@ -68,7 +70,8 @@ class OrdersPage(BasicPage):
 
     def approve_order(self, num_order):
         logger.info('Согласование заказа')
-        self.find_elem(self.ORDER_BUTTON_APPROVE_MANAGER)
+        # self.wait_for_page_loaded(self.ORDER_BUTTON_APPROVE_MANAGER)
+        # self.find_elem(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER_2)
         self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
