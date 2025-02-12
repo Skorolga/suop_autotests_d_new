@@ -23,6 +23,7 @@ class BasicPage(object):
         # Проверяем наличие элемента на странице
         try:
             element = WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
+            logger.info(f'Элемент {locator[1]} найден')
         except NoSuchElementException:
             logger.warning(f'Элемент {locator[1]} не найден')
             return False
@@ -33,23 +34,26 @@ class BasicPage(object):
         # Проверка кликабельности элемента
         try:
             WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable(locator))
-            # return element
+            return element
         except TimeoutException:
             logger.warning(f'Элемент {locator[1]} не найден за {timeout} секунд')
         except Exception as error:
             logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
             return False
 
+        #
+        # if element:
+        #     logger.info(f'Скроллим до элемента: {locator[1]}')
+        #     # action = ActionChains(self.browser)
+        #     # action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
+        #     self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        #     return element
+        # else:
+        #     return False
 
-        if element:
-            logger.info(f'Скроллим до элемента: {locator[1]}')
-            # action = ActionChains(self.browser)
-            # action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
-            self.browser.execute_script("arguments[0].scrollIntoView();", element)
-            return element
-        else:
-            return False
-
+    def scroll_to_element(self, element):
+        logger.info(f'Скроллим до элемента: {element}')
+        self.browser.execute_script("arguments[0].scrollIntoView();", element)
 
     def click_on_element(self, locator:tuple[str, str], timeout=timeout):
         element = self.find_elem(locator, timeout)
@@ -60,6 +64,10 @@ class BasicPage(object):
             except Exception as error:
                 logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error} в методе click_on_element')
                 logger.info(f'Видимость элемента: {element.is_displayed()}')
+                try:
+                    self.scroll_to_element(element)
+                except Exception as error:
+                    logger.info(f'Не удалось проскролить до элемента {locator[1]}')
                 self.browser.execute_script('arguments[0].click();', element)  # кликаем если элемент есть но кликнуть штатно не получилось
 
     def page_has_loaded(self):
