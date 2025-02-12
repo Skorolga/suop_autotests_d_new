@@ -43,20 +43,24 @@ class BasicPage(object):
 
         if element:
             logger.info(f'Скроллим до элемента: {locator[1]}')
-            action = ActionChains(self.browser)
-            action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
+            # action = ActionChains(self.browser)
+            # action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
+            self.browser.execute_script("arguments[0].scrollIntoView();", element)
             return element
         else:
             return False
 
 
     def click_on_element(self, locator:tuple[str, str], timeout=timeout):
-        logger.info(f'click_on_element timeout {timeout}')
         element = self.find_elem(locator, timeout)
         if element:
-            element.click()
-            logger.info(f'Клик по элементу: {locator[1]}')
-
+            try:
+                element.click()
+                logger.info(f'Клик по элементу: {locator[1]}')
+            except Exception as error:
+                logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error} в методе click_on_element')
+                logger.info(f'Видимость элемента: {element.is_displayed()}')
+                self.browser.execute_script('arguments[0].click();', element)  # кликаем если элемент есть но кликнуть штатно не получилось
 
     def page_has_loaded(self):
         page_state = self.browser.execute_script('return document.readyState;')

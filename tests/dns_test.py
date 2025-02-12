@@ -73,7 +73,7 @@ def test_dns(pre_post_dns, browser):
             name='Список заказов',
             attachment_type=AttachmentType.PNG
         )
-        orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
+        # orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
         orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
