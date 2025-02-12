@@ -89,7 +89,8 @@ def test_dns(pre_post_dns, browser):
         )
 
         orders_page.approve_order(order_num)
-        orders_page.del_order_dev(order_num)
+        auth_page.relogin_as_admin_suop()
+        orders_page.del_order(order_num)
 
         time.sleep(30)
         allure.attach(

@@ -49,8 +49,8 @@ def test_del(pre_post_dns, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_admin_suop()
-        order_num = '119967'
-        orders_page.del_order_dev(order_num)
+        order_num = '120140'
+        orders_page.del_order(order_num)
         allure.attach(
             body=main_page.browser.get_screenshot_as_png(),
             name='Статус заказа удален',

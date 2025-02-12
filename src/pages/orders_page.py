@@ -58,34 +58,16 @@ class OrdersPage(BasicPage):
         """Очистка параметров фильтра поиска страницы с заказами"""
         self.click_on_element(self.FILTER_CLEAN_BUTTON)
 
-    def del_order(self, num_order):
-        logger.info('Удаление заказа')
-        self.browser.refresh()
-        logger.info('Обновление')
-        self.find_order(num_order)
-        self.click_on_element(self.ORDER_POWER_OFF)
-        self.click_on_element(self.ORDER_POWER_OFF_MODAL_YES)
-        self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_STATUS_SHUTDOWN, 540)
-        self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_STATUS_STOPPED, 540)
-        self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_DELETE, 540)
-        self.click_on_element(self.ORDER_DELETE)
-        self.click_on_element(self.ORDER_DELETE_MODAL_YES)
-        self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
-        self.browser.refresh()
-        self.wait_for_page_loaded(self.ORDER_STATUS_DELETED, 540)
-
     def approve_order(self, num_order):
         logger.info('Согласование заказа')
         # self.wait_for_page_loaded(self.ORDER_BUTTON_APPROVE_MANAGER)
         # self.find_elem(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER_2)
-        self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
-        self.wait_for_page_loaded(self.ORDER_STATUS_READY, 540)
+        self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов', 60 * 10)
+        self.text_check(self.ORDER_STATUS, 'Работает', 60 * 10)
+        # self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
+        # self.wait_for_page_loaded(self.ORDER_STATUS_READY, 540)
 
     def text_check(self, locator, text_trigger, timeout):
         start_time = datetime.now()
@@ -113,7 +95,7 @@ class OrdersPage(BasicPage):
                 logger.info(f'Состояние не изменилось')
             time.sleep(10)
 
-    def del_order_dev(self, num_order):
+    def del_order(self, num_order):
         logger.info('Удаление заказа del_order_dev()')
         self.browser.refresh()  # обновляем страницу, баг с появлением УЗ Клиента
         logger.info('Обновление страницы')
