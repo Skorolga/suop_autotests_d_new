@@ -1,5 +1,4 @@
 import time
-from asyncio import timeout
 from datetime import datetime
 import allure
 from allure_commons.types import AttachmentType
@@ -43,35 +42,31 @@ class OrdersPage(BasicPage):
         super().__init__(browser)
 
     def find_order(self, num_order:str):
-        """Находит заказ"""
+        """Находит заказ но номеру"""
         self.browser.refresh()
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # ждем когда элемент исчезнет
-        # self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
-        time.sleep(2)
+        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
         self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
-        time.sleep(2)
+        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
         self.send_text(self.FILTER_INPUT_ID_ORDER, num_order)
-        time.sleep(2)
         self.click_on_element(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         composite_locator = (By.XPATH, f'//div[contains(@class, "orderRow")]/div[contains(text(), "{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 60)
 
     def approve_order(self, num_order):
+        """Согласовывает заказ за менеджера"""
         logger.info('Согласование заказа')
-        # self.wait_for_page_loaded(self.ORDER_BUTTON_APPROVE_MANAGER)
-        # self.find_elem(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER_2)
         self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов', 60 * 10)
         self.text_check(self.ORDER_STATUS, 'Работает', 60 * 10)
         logger.info('Ожидание состояние "Работает" у дочерних заказов')
         assert self.wait_ready_for_all_child_orders(), f'Не удалось согласовать заказ {num_order}'
-        # self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
-        # self.wait_for_page_loaded(self.ORDER_STATUS_READY, 540)
 
     def text_check(self, locator, text_trigger, timeout):
+        """Ожидает изменения текста элемента до переданного"""
         start_time = datetime.now()
         current_text = self.find_elem(locator).text
         logger.info(f'Состояние заказа: {current_text}')
@@ -98,6 +93,7 @@ class OrdersPage(BasicPage):
             time.sleep(10)
 
     def del_order(self, num_order):
+        """Удаляет заказ по номеру"""
         logger.info('Удаление заказа del_order_dev()')
         self.browser.refresh()  # обновляем страницу, баг с появлением УЗ Клиента
         logger.info('Обновление страницы')
@@ -112,15 +108,7 @@ class OrdersPage(BasicPage):
 
     def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
         """Находит на странице элементы и ждет когда их статус изменится на Работает"""
-        # elems = self.find_all_elem(locator)
-        # print(elems)
-        # print()
-        # print([t.text for t in elems])
-        # print()
-        # print([t.text.strip() == 'Работает' for t in elems])
-        # print()
-        # print(all([t.text.strip() == 'Работает' for t in elems]))
-        # elem_count = len(self.find_all_elem(locator))
+
         elem_count = 4  # количество ожидаемых элементов со статусом "Работает"
         logger.info(elem_count)
         try:
