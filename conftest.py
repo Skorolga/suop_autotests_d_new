@@ -1,5 +1,6 @@
 from datetime import datetime
 import time
+from sys import platform
 import subprocess
 import pytest
 from selenium import webdriver
@@ -16,6 +17,8 @@ def browser():
     options.add_argument("--disable-application-cache")
     options.add_argument("--disk-cache-size=0")
     options.set_capability('unhandledPromptBehavior', 'ignore')
+    if platform == 'linux':
+        options.add_argument('--headless')
 
     browser = webdriver.Chrome(options=options)
     # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным не использовать)
