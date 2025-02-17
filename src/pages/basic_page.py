@@ -11,7 +11,6 @@ from src.logger.formatted_logger import logger
 
 class BasicPage(object):
     """Основной класс для страниц"""
-
     timeout = 30
 
     def __init__(self, browser):
@@ -41,21 +40,21 @@ class BasicPage(object):
             logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error}')
             return False
 
-        #
-        # if element:
-        #     logger.info(f'Скроллим до элемента: {locator[1]}')
-        #     # action = ActionChains(self.browser)
-        #     # action.move_to_element_with_offset(element, 0, 0).pause(2).perform()
-        #     self.browser.execute_script("arguments[0].scrollIntoView();", element)
-        #     return element
-        # else:
-        #     return False
+    def find_all_elem(self, locator, timeout=timeout) -> list[WebElement] | bool:
+        """Находит и возвращает список элементов"""
+        try:
+            elems = WebDriverWait(self.browser, timeout).until(EC.presence_of_all_elements_located(locator))
+            return elems
+        except Exception as error:
+            logger.warning(f'Не удалось элементы по локатору {locator[1]}. Ошибка: {error}')
+            return False
 
     def scroll_to_element(self, element):
         logger.info(f'Скроллим до элемента: {element}')
         self.browser.execute_script("arguments[0].scrollIntoView();", element)
 
     def click_on_element(self, locator:tuple[str, str], timeout=timeout):
+        """Находит и кликает по элементу"""
         element = self.find_elem(locator, timeout)
         if element:
             try:
@@ -74,16 +73,20 @@ class BasicPage(object):
         page_state = self.browser.execute_script('return document.readyState;')
         return page_state == 'complete'
 
-    def wait_for_page_loaded(self, locator=None, timeout=timeout):
+    def wait_for_page_loaded(self, locator=None, timeout=timeout) -> bool:
+        """Ожидает загрузку страницы по переданному локатору"""
         WebDriverWait(self.browser, self.timeout).until(
             lambda b: b.execute_script("return document.readyState") == "complete")
         if locator:
             try:
                 WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
+                return True
             except TimeoutException:
-                logger.warning(f'Время ожидания элемента: {locator} в функции basic_page.wait_for_page_loaded()')
+                logger.warning(f'Вышло время ожидания загрузки страницы по элементу: {locator} в функции basic_page.wait_for_page_loaded()')
+                return False
 
     def save_scr(self, file_name:str):
+        """Сохраняет скриншот в текущий каталог"""
         self.wait_for_page_loaded()
         if self.page_has_loaded():
             self.browser.save_screenshot(f'{file_name}.png')

@@ -33,7 +33,7 @@ class Auth(BasicPage):
             self.browser.get(url)
 
     def auth_as_client(self):
-        """Авторизация под ролью клиента"""
+        """Авторизация под ролью клиента (первичная)"""
         self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
         self.wait_for_page_loaded(self.LOGIN_FORM)
         self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
@@ -70,7 +70,7 @@ class Auth(BasicPage):
         if self.find_elem(el_constructor, 2):
             self.click_on_element(el_constructor, 2)
         else:
-            # TODO доделать перебор пагинации (лучше когда снимут ограничение в 2 сессии)
+            # TODO доделать перебор пагинации (сделать когда снимут ограничение в 2 сессии)
             self.click_on_element(self.AUTH_MODAL_PAGINATION_NEXT)
             self.click_on_element(el_constructor)
 

@@ -1,4 +1,5 @@
 import time
+from asyncio import timeout
 from datetime import datetime
 import allure
 from allure_commons.types import AttachmentType
@@ -34,12 +35,15 @@ class OrdersPage(BasicPage):
     ORDER_POWER_OFF_MODAL_YES = (By.XPATH, '//button[contains(text(), "Да")]')
     ORDER_DELETE = (By.XPATH, '//button[contains(text(), "Освободить ресурсы")]')
     ORDER_DELETE_MODAL_YES = (By.XPATH, '//button[contains(text(), "Да")]')
+    ORDER_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div')  # Для поиска всех элементов со статусом дочерних заказах
+    READY_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div[text()="Работает"]')  # Для поиска всех элементов со статусом дочерних заказах
 
 
     def __init__(self, browser):
         super().__init__(browser)
 
     def find_order(self, num_order:str):
+        """Находит заказ"""
         self.browser.refresh()
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # ждем когда элемент исчезнет
@@ -54,10 +58,6 @@ class OrdersPage(BasicPage):
         composite_locator = (By.XPATH, f'//div[contains(@class, "orderRow")]/div[contains(text(), "{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 60)
 
-    def clean_filter_for_find_orders(self):
-        """Очистка параметров фильтра поиска страницы с заказами"""
-        self.click_on_element(self.FILTER_CLEAN_BUTTON)
-
     def approve_order(self, num_order):
         logger.info('Согласование заказа')
         # self.wait_for_page_loaded(self.ORDER_BUTTON_APPROVE_MANAGER)
@@ -66,6 +66,8 @@ class OrdersPage(BasicPage):
         self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER_2)
         self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов', 60 * 10)
         self.text_check(self.ORDER_STATUS, 'Работает', 60 * 10)
+        logger.info('Ожидание состояние "Работает" у дочерних заказов')
+        assert self.wait_ready_for_all_child_orders(), f'Не удалось согласовать заказ {num_order}'
         # self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
         # self.wait_for_page_loaded(self.ORDER_STATUS_READY, 540)
 
@@ -104,20 +106,27 @@ class OrdersPage(BasicPage):
         self.click_on_element(self.ORDER_POWER_OFF_MODAL_YES)
         self.text_check(self.ORDER_STATUS, 'Выключен', 60*10)
         self.browser.refresh()
-        # self.wait_for_page_loaded(self.ORDER_STATUS_SHUTDOWN, 540)
-        # self.browser.refresh()
-        # self.wait_for_page_loaded(self.ORDER_STATUS_STOPPED, 540)
-        # self.browser.refresh()
-        # self.wait_for_page_loaded(self.ORDER_DELETE, 540)
         self.click_on_element(self.ORDER_DELETE, 60*3)
         self.click_on_element(self.ORDER_DELETE_MODAL_YES, 60*3)
-        # self.browser.refresh()
-        # self.wait_for_page_loaded(self.ORDER_STATUS_CHANGE, 540)
-        # self.browser.refresh()
-        # self.wait_for_page_loaded(self.ORDER_STATUS_DELETED, 540)
         self.text_check(self.ORDER_STATUS, 'Удален', 60 * 10)
 
-
-
-
-
+    def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
+        """Находит на странице элементы и ждет когда их статус изменится на Работает"""
+        # elems = self.find_all_elem(locator)
+        # print(elems)
+        # print()
+        # print([t.text for t in elems])
+        # print()
+        # print([t.text.strip() == 'Работает' for t in elems])
+        # print()
+        # print(all([t.text.strip() == 'Работает' for t in elems]))
+        # elem_count = len(self.find_all_elem(locator))
+        elem_count = 4  # количество ожидаемых элементов со статусом "Работает"
+        logger.info(elem_count)
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda b: len(self.find_all_elem(locator)) >= elem_count)
+            logger.warning(f'Все заказы перешли в состояние "Работает".')
+            return True
+        except Exception as error:
+            logger.warning(f'Дочерние заказы не перешли в состояние "Работает". Ошибка: {error}')
+            return False

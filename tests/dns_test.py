@@ -66,14 +66,12 @@ def test_dns(pre_post_dns, browser):
     step_name = 'Согласование созданного заказа за менеджера'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        # auth_page.relogin_as_manager()
         orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Список заказов',
             attachment_type=AttachmentType.PNG
         )
-        # orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
         orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
@@ -89,24 +87,15 @@ def test_dns(pre_post_dns, browser):
         )
 
         orders_page.approve_order(order_num)
-        auth_page.relogin_as_admin_suop()
-        orders_page.del_order(order_num)
 
-        time.sleep(30)
-        allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Согласование заказа',
-            attachment_type=AttachmentType.PNG
-        )
-
-
-    step_name = 'Личный кабинет администратора'
+    step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_admin_suop()
-        auth_page.wait_for_page_loaded(auth_page.PROFILE_NAME_ADMIN)
+        orders_page.del_order(order_num)
+
         allure.attach(
-            body=main_page.browser.get_screenshot_as_png(),
-            name='Личный_кабинет_Администратор_СУОП',
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Удаленный заказ',
             attachment_type=AttachmentType.PNG
         )
