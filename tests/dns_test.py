@@ -59,7 +59,7 @@ def test_dns(pre_post_dns, browser):
         auth_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
-            name='Manager',
+            name='Личный кабинет менеджера',
             attachment_type=AttachmentType.PNG
         )
 

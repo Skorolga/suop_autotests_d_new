@@ -61,7 +61,7 @@ class BasicPage(object):
                 element.click()
                 logger.info(f'Клик по элементу: {locator[1]}')
             except Exception as error:
-                logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка: {error} в методе click_on_element')
+                logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка в методе click_on_element')
                 logger.info(f'Видимость элемента: {element.is_displayed()}')
                 try:
                     self.scroll_to_element(element)

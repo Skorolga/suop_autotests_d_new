@@ -21,17 +21,18 @@ def browser():
         options.add_argument('--headless')
 
     browser = webdriver.Chrome(options=options)
-    # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным не использовать)
+    # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным использовать не рекомендуется)
 
     yield browser
     browser.quit()
 
 
 @pytest.hookimpl()
-def pytest_sessionfinish(session, exitstatus):
+def pytest_sessionfinish(session):
     dir_name = f'{session.items[0].name}_{datetime.now().strftime("%d.%m.%Y_%H.%M.%S")}'
     cmd = f'allure generate -c ./allure-results --single-file -o ./allure-report/{dir_name}'
     proc = subprocess.Popen(cmd, shell=True, universal_newlines=True, stdout=subprocess.PIPE, text=True)
     proc.wait()  # ждем завершение процесса subprocess
-    cmd = f'.\\allure-report\\{dir_name}\\index.html'  # после теста открываем отчет
+    if platform == 'win32':
+        cmd = f'.\\allure-report\\{dir_name}\\index.html'  # после теста открываем отчет
     subprocess.Popen(cmd, shell=True, universal_newlines=True, stdout=subprocess.PIPE, text=True)
