@@ -48,12 +48,12 @@ class OrdersPage(BasicPage):
         """Находит заказ но номеру"""
         self.browser.refresh()
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
-        self.browser.refresh()
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
-        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
+        time.sleep(2)
         self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
-        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
+        time.sleep(2)
         self.send_text(self.FILTER_INPUT_ID_ORDER, num_order)
+        time.sleep(2)
         self.click_on_element(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         composite_locator = (By.XPATH, f'//div[contains(@class, "orderRow")]/div[contains(text(), "{num_order}")]')

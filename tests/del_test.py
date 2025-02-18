@@ -44,27 +44,28 @@ def test_del(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num = '120571'
-    # step_name = 'Согласование созданного заказа за менеджера'
-    # with allure.step(step_name):
-    #     logger.info('Шаг: ' + step_name)
-    #     auth_page.relogin_as_manager()
-    #     # orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-    #     # allure.attach(
-    #     #     body=auth_page.browser.get_screenshot_as_png(),
-    #     #     name='Список заказов',
-    #     #     attachment_type=AttachmentType.PNG
-    #     # )
-    #     # orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
-    #     orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-    #     orders_page.find_order(order_num)
-    #     allure.attach(
-    #         body=auth_page.browser.get_screenshot_as_png(),
-    #         name='Найденный заказ',
-    #         attachment_type=AttachmentType.PNG
-    #     )
-    #     orders_page.approve_order(order_num)
-    #     orders_page.wait_ready_for_all_child_orders()
+    order_num = '120641'
+    step_name = 'Согласование созданного заказа за менеджера'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.relogin_as_manager()
+        # orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+        # allure.attach(
+        #     body=auth_page.browser.get_screenshot_as_png(),
+        #     name='Список заказов',
+        #     attachment_type=AttachmentType.PNG
+        # )
+        # orders_page.clean_filter_for_find_orders()  # Сброс фильтров для поиска заказов
+        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+        orders_page.find_order(order_num)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Найденный заказ',
+            attachment_type=AttachmentType.PNG
+        )
+        orders_page.approve_order(order_num)
+        orders_page.wait_ready_for_all_child_orders()
+
     step_name = f'Разрешение на изменение ресурсов заказа {order_num}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
@@ -76,6 +77,8 @@ def test_del(pre_post_dns, browser):
             name='Разрешение на изменение ресурсов',
             attachment_type=AttachmentType.PNG
         )
+
+
     step_name = 'Удаление заказа'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)

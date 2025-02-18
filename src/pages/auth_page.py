@@ -1,3 +1,5 @@
+import time
+
 import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
@@ -25,7 +27,8 @@ class Auth(BasicPage):
 
     ADMIN_SUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
     PROFILE_NAME_ADMIN = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
-    PROFILE_NAME_CLIENT = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Администратор СУ ОП
+    PROFILE_NAME_MANAGER = (By.XPATH, '//p[text()="ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами"]')  # для проверки выбора роли Администратор СУ ОП
+    PROFILE_NAME_CLIENT = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Клиента
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
@@ -45,6 +48,7 @@ class Auth(BasicPage):
         )
         self.click_on_element(self.SUBMIT_BTN)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
+        time.sleep(3)
 
     def relogin_as_admin_suop(self, first_auth=False):
         """Авторизация под ролью Администратора"""
@@ -52,8 +56,9 @@ class Auth(BasicPage):
             # Если это не первая авторизация сначала переходим на страницу выбора организации
             self.click_on_element(self.CAB_AVATAR)
             self.click_on_element(self.MENU_CHANGE_ROLE)
-
         self.select_role('Администраторы СУ ОП')
+        self.wait_for_page_loaded(self.PROFILE_NAME_ADMIN)
+        time.sleep(3)
 
     def relogin_as_manager(self, first_auth=False):
         """Авторизация под ролью ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами"""
@@ -62,6 +67,8 @@ class Auth(BasicPage):
             self.click_on_element(self.CAB_AVATAR)
             self.click_on_element(self.MENU_CHANGE_ROLE)
         self.select_role('ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами')
+        self.wait_for_page_loaded(self.PROFILE_NAME_MANAGER)
+        time.sleep(3)
 
     def select_role(self, role:str):
         """Выбирает роль (организацию) по названию"""
