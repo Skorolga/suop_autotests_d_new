@@ -1,7 +1,5 @@
 import time
 from datetime import datetime
-import allure
-from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -36,6 +34,11 @@ class OrdersPage(BasicPage):
     ORDER_DELETE_MODAL_YES = (By.XPATH, '//button[contains(text(), "Да")]')
     ORDER_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div')  # Для поиска всех элементов со статусом дочерних заказах
     READY_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div[text()="Работает"]')  # Для поиска всех элементов со статусом дочерних заказах
+    RIGHTS_FOR_CHANGE_RESOURCES = (By.XPATH, '//div[text()="Разрешить менять объем услуг"]/following-sibling::div[last()]/div')  # Кнопка для изменения ресурсов
+    RIGHTS_FOR_CHANGE_RESOURCES_SELECT = (By.XPATH, '//div[text()="Разрешить менять объем услуг"]/following-sibling::div[1]')  # Выпадающее меню Да/Нет
+    RIGHTS_FOR_CHANGE_RESOURCES_SELECT_YES = (By.XPATH, '//div[contains(@id, "option-0")]') # Значение Да в выпадающем меню (не select)
+    RIGHTS_FOR_CHANGE_RESOURCES_CONFIRM = (By.XPATH, '//*[@id="confirm"]')
+    RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON = (By.XPATH, '//div[contains(@class, "loader-local")]')  # Иконка ожидания применения изменений
 
 
     def __init__(self, browser):
@@ -45,7 +48,8 @@ class OrdersPage(BasicPage):
         """Находит заказ но номеру"""
         self.browser.refresh()
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
-        WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # ждем когда элемент исчезнет
+        self.browser.refresh()
+        WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
         self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK, 60)
@@ -95,7 +99,7 @@ class OrdersPage(BasicPage):
     def del_order(self, num_order):
         """Удаляет заказ по номеру"""
         logger.info('Удаление заказа del_order_dev()')
-        self.browser.refresh()  # обновляем страницу, баг с появлением УЗ Клиента
+        self.browser.refresh()  # Обновляем страницу, баг с появлением УЗ Клиента
         logger.info('Обновление страницы')
         self.find_order(num_order)
         self.click_on_element(self.ORDER_POWER_OFF)
@@ -109,8 +113,8 @@ class OrdersPage(BasicPage):
     def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
         """Находит на странице элементы и ждет когда их статус изменится на Работает"""
 
-        elem_count = 4  # количество ожидаемых элементов со статусом "Работает"
-        logger.info(elem_count)
+        elem_count = 4  # Количество ожидаемых элементов со статусом "Работает"
+        logger.info(f'количество ожидаемых элементов со статусом "Работает"{elem_count}')
         try:
             WebDriverWait(self.browser, timeout).until(lambda b: len(self.find_all_elem(locator)) >= elem_count)
             logger.warning(f'Все заказы перешли в состояние "Работает".')
@@ -118,3 +122,17 @@ class OrdersPage(BasicPage):
         except Exception as error:
             logger.warning(f'Дочерние заказы не перешли в состояние "Работает". Ошибка: {error}')
             return False
+
+    def set_rights_resources(self):
+        """Устанавливает разрешение на изменение ресурсов в заказе"""
+        logger.info('Устанавливает разрешение на изменение ресурсов в заказе')
+        # self.browser.refresh()
+        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES)
+        time.sleep(2)
+        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT)
+        time.sleep(2)
+        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT_YES)  # Значение Да в выпадающем меню (не select)
+        time.sleep(2)
+        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_CONFIRM)
+        WebDriverWait(self.browser, 30).until(
+            EC.invisibility_of_element(self.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет

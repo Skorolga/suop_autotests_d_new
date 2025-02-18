@@ -14,8 +14,10 @@ def browser():
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--start-maximized")
     options.add_argument("--lang= ru")
-    options.add_argument("--disable-application-cache")
-    options.add_argument("--disk-cache-size=0")
+    # options.add_argument("--disable-application-cache")
+    options.add_argument("--incognito")
+
+    # options.add_argument("--disk-cache-size=0")
     options.set_capability('unhandledPromptBehavior', 'ignore')
     if platform == 'linux':
         options.add_argument('--headless')

@@ -88,6 +88,19 @@ def test_dns(pre_post_dns, browser):
 
         orders_page.approve_order(order_num)
 
+    step_name = f'Разрешение на изменение ресурсов заказа {order_num}'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.relogin_as_manager()
+        orders_page.find_order(order_num)
+        orders_page.set_rights_resources()
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Разрешение на изменение ресурсов',
+            attachment_type=AttachmentType.PNG
+        )
+
+
     step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
