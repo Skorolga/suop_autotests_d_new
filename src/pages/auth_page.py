@@ -35,12 +35,16 @@ class Auth(BasicPage):
         if url:
             self.browser.get(url)
 
-    def auth_as_client(self):
+    def auth_as_client(self, first_auth=False):
         """Авторизация под ролью клиента (первичная)"""
-        self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
-        self.wait_for_page_loaded(self.LOGIN_FORM)
-        self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
-        self.send_text(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
+        if not first_auth:
+            self.click_on_element(self.CAB_AVATAR)
+            self.click_on_element(self.MENU_CHANGE_ROLE)
+        else:
+            self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
+            self.wait_for_page_loaded(self.LOGIN_FORM)
+            self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
+            self.send_text(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Форма_авторизации',
