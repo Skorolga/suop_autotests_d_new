@@ -13,7 +13,8 @@ def browser():
     options.add_argument("--disable-notifications")
     options.add_argument("--ignore-certificate-errors")
     options.add_argument("--start-maximized")
-    options.add_argument("--lang= ru")
+    options.add_argument("--lang=ru-RU")
+    options.add_experimental_option('prefs', {'intl.accept_languages': 'ru,ru_RU'})
     # options.add_argument("--disable-application-cache")
     options.add_argument("--incognito")
 
