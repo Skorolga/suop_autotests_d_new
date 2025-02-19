@@ -46,7 +46,7 @@ class OrdersPage(BasicPage):
 
     def find_order(self, num_order:str):
         """Находит заказ но номеру"""
-        self.browser.refresh()
+        # self.browser.refresh()
         self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         time.sleep(2)

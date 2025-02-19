@@ -36,7 +36,7 @@ def test_del(pre_post_dns, browser):
     step_name = 'Личный кабинет клиента'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        auth_page.auth_as_client()
+        auth_page.auth_as_client(first_auth=True)
         main_page.wait_for_page_loaded(auth_page.PROFILE_NAME_CLIENT)  # Ожидание появление элемента
         client_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         allure.attach(
@@ -44,7 +44,7 @@ def test_del(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num = '120641'
+    order_num = '120684'
     step_name = 'Согласование созданного заказа за менеджера'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
