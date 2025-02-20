@@ -53,7 +53,7 @@ class BasicPage(object):
         logger.info(f'Скроллим до элемента: {element}')
         self.browser.execute_script("arguments[0].scrollIntoView();", element)
 
-    def click_on_element(self, locator:tuple[str, str], timeout=timeout):
+    def click(self, locator:tuple[str, str], timeout=timeout):
         """Находит и кликает по элементу"""
         element = self.find_elem(locator, timeout)
         if element:
@@ -91,7 +91,7 @@ class BasicPage(object):
         if self.page_has_loaded():
             self.browser.save_screenshot(f'{file_name}.png')
 
-    def send_text(self, locator, text):
+    def type(self, locator, text):
         self.browser.find_element(*locator).send_keys(text)
 
     def get_text(self, locator):

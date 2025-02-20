@@ -29,10 +29,10 @@ class ClientPage(BasicPage):
     def make_order(self, timeout=180) -> str:
         """Метод создает заказ Публичное облако под уже авторизованным клиентом и возвращает номер заказа"""
         logger.info('Создание заказа Публичное облако за клиента')
-        self.click_on_element(self.MENU_MAKE_ORDER)
+        self.click(self.MENU_MAKE_ORDER)
         self.wait_for_page_loaded(self.BANNER_MAKE_ORDER)
-        self.click_on_element(self.BANNER_MAKE_ORDER)
-        self.click_on_element(self.BUTTON_MAKE_ORDER)
+        self.click(self.BANNER_MAKE_ORDER)
+        self.click(self.BUTTON_MAKE_ORDER)
         self.wait_for_page_loaded(self.FORM_TITLE_CONF)
         # проверяем начисление
         cost = self.check_cost(self.COST_WITHOUT_TAX)
@@ -43,7 +43,7 @@ class ClientPage(BasicPage):
             name='Страница с формой для создания заказа',
             attachment_type=AttachmentType.PNG
         )
-        self.click_on_element(self.SUBMIT_BUTTON)  # Итоговая кнопка создания заказа
+        self.click(self.SUBMIT_BUTTON)  # Итоговая кнопка создания заказа
         # ждем создания заказа и получаем его номер
         self.wait_for_page_loaded(self.NEW_ORDER_NUM)
         start_time = datetime.now()
@@ -68,7 +68,7 @@ class ClientPage(BasicPage):
             name='Номер созданного заказа',
             attachment_type=AttachmentType.PNG
         )
-        self.click_on_element(self.GO_TO_ORDER)
+        self.click(self.GO_TO_ORDER)
         self.wait_for_page_loaded(self.VIRT_MACH_TITLE)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
