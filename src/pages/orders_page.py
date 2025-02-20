@@ -60,7 +60,8 @@ class OrdersPage(BasicPage):
         time.sleep(2)
         self.click(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
-        composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")] | //td[contains(text(),"{num_order}")]')
+        composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")] | '
+                                       f'//td[contains(text(),"{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 15)  # TODO локаторы клиента и администратора отличаются (под клиентом верстка элемента в <table>)
 
     def approve_order(self, num_order):
