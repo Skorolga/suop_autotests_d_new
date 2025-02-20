@@ -33,7 +33,7 @@ class OrdersPage(BasicPage):
     ORDER_DELETE = (By.XPATH, '//button[contains(text(), "Освободить ресурсы")]')
     ORDER_DELETE_MODAL_YES = (By.XPATH, '//button[contains(text(), "Да")]')
     ORDER_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div')  # Для поиска всех элементов со статусом дочерних заказах
-    READY_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div[text()="Работает"]')  # Для поиска всех элементов со статусом дочерних заказах
+    READY_STATUS_ALL_SUBORDERS = (By.XPATH, '//div[(text()="Состояние")]/following-sibling::div[text()="Работает"]')  # Для поиска всех элементов со статусом "Работает" дочерних заказах
     RIGHTS_FOR_CHANGE_RESOURCES = (By.XPATH, '//div[text()="Разрешить менять объем услуг"]/following-sibling::div[last()]/div')  # Кнопка для изменения ресурсов
     RIGHTS_FOR_CHANGE_RESOURCES_SELECT = (By.XPATH, '//div[text()="Разрешить менять объем услуг"]/following-sibling::div[1]')  # Выпадающее меню Да/Нет
     RIGHTS_FOR_CHANGE_RESOURCES_SELECT_YES = (By.XPATH, '//div[contains(@id, "option-0")]') # Значение Да в выпадающем меню (не select)
@@ -46,7 +46,7 @@ class OrdersPage(BasicPage):
 
     def find_order(self, num_order:str, clear_filter=True):
         """
-        Находит заказ но номеру.
+        Находит заказ по номеру.
         clear_filter под клиентом нет кнопки "Очистить все"
         """
         # self.browser.refresh()
@@ -61,7 +61,7 @@ class OrdersPage(BasicPage):
         self.click(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")]')
-        self.wait_for_page_loaded(composite_locator, 60)
+        self.wait_for_page_loaded(composite_locator, 10)  # TODO локаторы клиента и администратора отличаются (под клиентом верстка элемента в <table>)
 
     def approve_order(self, num_order):
         """Согласовывает заказ за менеджера"""

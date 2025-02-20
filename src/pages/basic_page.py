@@ -92,6 +92,7 @@ class BasicPage(object):
             self.browser.save_screenshot(f'{file_name}.png')
 
     def type(self, locator, text):
+        """Набирает тест"""
         self.browser.find_element(*locator).send_keys(text)
 
     def get_text(self, locator):
