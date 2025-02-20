@@ -51,14 +51,14 @@ class OrdersPage(BasicPage):
         """
         # self.browser.refresh()
         if clear_filter:
-            self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
+            self.click(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         time.sleep(2)
-        self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
+        self.click(self.FILTER_FOR_FIND_ORDERS)
         time.sleep(2)
-        self.send_text(self.FILTER_INPUT_ID_ORDER, num_order)
+        self.type(self.FILTER_INPUT_ID_ORDER, num_order)
         time.sleep(2)
-        self.click_on_element(self.FILTER_FORM_APPLY_BUTTON)
+        self.click(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 60)
@@ -66,8 +66,8 @@ class OrdersPage(BasicPage):
     def approve_order(self, num_order):
         """Согласовывает заказ за менеджера"""
         logger.info('Согласование заказа')
-        self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER)
-        self.click_on_element(self.ORDER_BUTTON_APPROVE_MANAGER_2)
+        self.click(self.ORDER_BUTTON_APPROVE_MANAGER)
+        self.click(self.ORDER_BUTTON_APPROVE_MANAGER_2)
         self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов', 60 * 10)
         self.text_check(self.ORDER_STATUS, 'Работает', 60 * 10)
         logger.info('Ожидание состояние "Работает" у дочерних заказов')
@@ -106,12 +106,12 @@ class OrdersPage(BasicPage):
         self.browser.refresh()  # Обновляем страницу, баг с появлением УЗ Клиента
         logger.info('Обновление страницы')
         self.find_order(num_order)
-        self.click_on_element(self.ORDER_POWER_OFF)
-        self.click_on_element(self.ORDER_POWER_OFF_MODAL_YES)
+        self.click(self.ORDER_POWER_OFF)
+        self.click(self.ORDER_POWER_OFF_MODAL_YES)
         self.text_check(self.ORDER_STATUS, 'Выключен', 60*10)
         self.browser.refresh()
-        self.click_on_element(self.ORDER_DELETE, 60*3)
-        self.click_on_element(self.ORDER_DELETE_MODAL_YES, 60*3)
+        self.click(self.ORDER_DELETE, 60 * 3)
+        self.click(self.ORDER_DELETE_MODAL_YES, 60 * 3)
         self.text_check(self.ORDER_STATUS, 'Удален', 60 * 10)
 
     def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
@@ -131,12 +131,12 @@ class OrdersPage(BasicPage):
         """Устанавливает разрешение на изменение ресурсов в заказе"""
         logger.info('Устанавливает разрешение на изменение ресурсов в заказе')
         # self.browser.refresh()
-        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES)
+        self.click(self.RIGHTS_FOR_CHANGE_RESOURCES)
         time.sleep(2)
-        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT)
+        self.click(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT)
         time.sleep(2)
-        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT_YES)  # Значение Да в выпадающем меню (не select)
+        self.click(self.RIGHTS_FOR_CHANGE_RESOURCES_SELECT_YES)  # Значение Да в выпадающем меню (не select)
         time.sleep(2)
-        self.click_on_element(self.RIGHTS_FOR_CHANGE_RESOURCES_CONFIRM)
+        self.click(self.RIGHTS_FOR_CHANGE_RESOURCES_CONFIRM)
         WebDriverWait(self.browser, 30).until(
             EC.invisibility_of_element(self.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет

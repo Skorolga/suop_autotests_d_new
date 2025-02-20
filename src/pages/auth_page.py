@@ -36,22 +36,25 @@ class Auth(BasicPage):
             self.browser.get(url)
 
     def auth_as_client(self, first_auth=False):
-        """Авторизация под ролью клиента (первичная)"""
+        """
+        Авторизация под ролью клиента (первичная)
+        first_auth - указатель это первичная авторизация или релогин (разные шаги)
+        """
         if not first_auth:
-            self.click_on_element(self.CAB_AVATAR)
-            self.click_on_element(self.MENU_CHANGE_ROLE)
+            self.click(self.CAB_AVATAR)
+            self.click(self.MENU_CHANGE_ROLE)
         else:
-            self.click_on_element(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
+            self.click(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
             self.wait_for_page_loaded(self.LOGIN_FORM)
-            self.send_text(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
-            self.send_text(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
+            self.type(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
+            self.type(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Форма_авторизации',
             attachment_type=AttachmentType.PNG
         )
         if first_auth:
-            self.click_on_element(self.SUBMIT_BTN)
+            self.click(self.SUBMIT_BTN)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
         time.sleep(3)
 
@@ -59,8 +62,8 @@ class Auth(BasicPage):
         """Авторизация под ролью Администратора"""
         if not first_auth:
             # Если это не первая авторизация сначала переходим на страницу выбора организации
-            self.click_on_element(self.CAB_AVATAR)
-            self.click_on_element(self.MENU_CHANGE_ROLE)
+            self.click(self.CAB_AVATAR)
+            self.click(self.MENU_CHANGE_ROLE)
         self.select_role('Администраторы СУ ОП')
         self.wait_for_page_loaded(self.PROFILE_NAME_ADMIN)
         time.sleep(3)
@@ -69,8 +72,8 @@ class Auth(BasicPage):
         """Авторизация под ролью ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами"""
         if not first_auth:
             # Если это не первая авторизация сначала переходим на страницу выбора организации
-            self.click_on_element(self.CAB_AVATAR)
-            self.click_on_element(self.MENU_CHANGE_ROLE)
+            self.click(self.CAB_AVATAR)
+            self.click(self.MENU_CHANGE_ROLE)
         self.select_role('ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами')
         self.wait_for_page_loaded(self.PROFILE_NAME_MANAGER)
         time.sleep(3)
@@ -80,13 +83,13 @@ class Auth(BasicPage):
         el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
         self.wait_for_page_loaded(self.AUTH_MODAL_MAIN_TABLE)
         if self.find_elem(el_constructor, 2):
-            self.click_on_element(el_constructor, 2)
+            self.click(el_constructor, 2)
         else:
             # TODO доделать перебор пагинации (сделать когда снимут ограничение в 2 сессии)
-            self.click_on_element(self.AUTH_MODAL_PAGINATION_NEXT)
-            self.click_on_element(el_constructor)
+            self.click(self.AUTH_MODAL_PAGINATION_NEXT)
+            self.click(el_constructor)
 
     def logout(self):
         """Выход из учетной записи"""
-        self.click_on_element(self.CAB_AVATAR)
-        self.click_on_element(self.LOGOUT_PROFILE_MENU)
+        self.click(self.CAB_AVATAR)
+        self.click(self.LOGOUT_PROFILE_MENU)

@@ -19,6 +19,6 @@ class MainPage(BasicPage):
 
     def auth_main_page(self):
         """Функция авторизации через главную страницу"""
-        self.click_on_element(self.LK_BUTTON)
+        self.click(self.LK_BUTTON)
 
 
