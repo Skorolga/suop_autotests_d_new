@@ -114,7 +114,7 @@ class OrdersPage(BasicPage):
         """Находит на странице элементы и ждет когда их статус изменится на Работает"""
 
         elem_count = 4  # Количество ожидаемых элементов со статусом "Работает"
-        logger.info(f'количество ожидаемых элементов со статусом "Работает"{elem_count}')
+        logger.info(f'Количество ожидаемых элементов со статусом "Работает": {elem_count} ед.')
         try:
             WebDriverWait(self.browser, timeout).until(lambda b: len(self.find_all_elem(locator)) >= elem_count)
             logger.warning(f'Все заказы перешли в состояние "Работает".')
