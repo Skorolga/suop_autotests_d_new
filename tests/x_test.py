@@ -1,8 +1,7 @@
 import time
-from asyncio import timeout
-
 import allure
 from allure_commons.types import AttachmentType
+from selenium.webdriver.common.by import By
 import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import Auth
@@ -50,8 +49,11 @@ def test_x(pre_post_dns, browser):
     step_name = 'Открытие заказа за клиента'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        orders_page.find_order(order_num)
+        orders_page.find_order(order_num, clear_filter=False)
+        composite_locator = (By.XPATH, f'//td[contains(text(),"{order_num}")]')
+        orders_page.click(composite_locator)
         order_page.click(order_page.MENU_INF_NETWORK)
+        order_page.click(order_page.MENU_INF_NETWORK__DNS)
         time.sleep(3)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),

@@ -15,3 +15,4 @@ class OrderPage(BasicPage):
         super().__init__(browser)
 
     MENU_INF_NETWORK = (By.XPATH, '//span[contains(text(), "Инфраструктура и")]')
+    MENU_INF_NETWORK__DNS = (By.XPATH, '//button[contains(text(), "Управление DNS")]')
