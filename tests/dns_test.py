@@ -20,6 +20,7 @@ def pre_post_dns(browser):
 @allure.tag('dns')
 @allure.testcase('https://jira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
 @allure.story('Управление DNS. Добавление домена.')
+@pytest.mark.dns
 def test_dns(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
 
