@@ -50,7 +50,8 @@ class Auth(BasicPage):
             name='Форма_авторизации',
             attachment_type=AttachmentType.PNG
         )
-        self.click_on_element(self.SUBMIT_BTN)
+        if first_auth:
+            self.click_on_element(self.SUBMIT_BTN)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
         time.sleep(3)
 

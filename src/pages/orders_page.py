@@ -44,10 +44,14 @@ class OrdersPage(BasicPage):
     def __init__(self, browser):
         super().__init__(browser)
 
-    def find_order(self, num_order:str):
-        """Находит заказ но номеру"""
+    def find_order(self, num_order:str, clear_filter=True):
+        """
+        Находит заказ но номеру.
+        clear_filter под клиентом нет кнопки "Очистить все"
+        """
         # self.browser.refresh()
-        self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
+        if clear_filter:
+            self.click_on_element(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         time.sleep(2)
         self.click_on_element(self.FILTER_FOR_FIND_ORDERS)
@@ -56,7 +60,7 @@ class OrdersPage(BasicPage):
         time.sleep(2)
         self.click_on_element(self.FILTER_FORM_APPLY_BUTTON)
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
-        composite_locator = (By.XPATH, f'//div[contains(@class, "orderRow")]/div[contains(text(), "{num_order}")]')
+        composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 60)
 
     def approve_order(self, num_order):
