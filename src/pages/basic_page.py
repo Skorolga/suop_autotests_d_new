@@ -22,7 +22,7 @@ class BasicPage(object):
         # Проверяем наличие элемента на странице
         try:
             element = WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
-            logger.info(f'Элемент {locator[1]} найден')
+            # logger.info(f'Элемент {locator[1]} найден')
         except NoSuchElementException:
             logger.warning(f'Элемент {locator[1]} не найден')
             return False

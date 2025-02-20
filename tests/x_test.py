@@ -53,7 +53,9 @@ def test_x(pre_post_dns, browser):
         composite_locator = (By.XPATH, f'//td[contains(text(),"{order_num}")]')
         orders_page.click(composite_locator)
         order_page.click(order_page.MENU_INF_NETWORK)
-        order_page.click(order_page.MENU_INF_NETWORK__DNS)
+        order_page.click(order_page.MENU_INF_NETWORK__DNS)  # Раскрываем в меню настройки ДНС
+        # logger.info(order_page.find_elem(order_page.DOMAIN_TITLE).text)
+        # assert order_page.find_elem(order_page.DOMAIN_TITLE).text == 'Домены'
         time.sleep(3)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),

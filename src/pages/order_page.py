@@ -16,3 +16,12 @@ class OrderPage(BasicPage):
 
     MENU_INF_NETWORK = (By.XPATH, '//span[contains(text(), "Инфраструктура и")]')
     MENU_INF_NETWORK__DNS = (By.XPATH, '//button[contains(text(), "Управление DNS")]')
+
+    DOMAIN_TITLE = (By.XPATH, '//div[@class="section-title section-title--left"]')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
+    DOMAIN_TITLE = (By.XPATH, '')
