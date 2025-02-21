@@ -55,11 +55,12 @@ def test_x(pre_post_dns, browser):
         order_page.click(order_page.MENU_INF_NETWORK)
         order_page.click(order_page.MENU_INF_NETWORK__DNS)  # Раскрываем в меню настройки ДНС
         order_page.wait_for_page_loaded(order_page.DOMAIN_TITLE)
-        # logger.info(order_page.get_text(order_page.DOMAIN_TITLE))
         assert 'Домены' in order_page.find_elem(order_page.DOMAIN_TITLE).text, 'Заголовок "Домены" не найден'
         domains_count = int(''.join([i for i in order_page.find_elem(order_page.DOMAIN_TITLE).text if i.isdigit()]))
-        assert domains_count
-        assert domains_count > 0, 'не указано количество доменов в заголовке'
+        assert domains_count, 'Не указано количество доменов в заголовке'
+        assert domains_count > 0, 'Не указано количество доменов в заголовке'
+        order_page.click(order_page.DOMAIN_ORDER_DROPDOWN)
+        order_page.click(order_page.DOMAIN_ORDER_ADD_AN_ENTRY)
         time.sleep(3)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),

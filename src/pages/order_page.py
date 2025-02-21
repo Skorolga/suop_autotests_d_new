@@ -18,5 +18,8 @@ class OrderPage(BasicPage):
     MENU_INF_NETWORK__DNS = (By.XPATH, '//button[contains(text(), "Управление DNS")]')
 
     DOMAIN_TITLE = (By.XPATH, '//div[@class="section-title section-title--left"]')
+    DOMAIN_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[4]')
+    DOMAIN_ORDER_ADD_AN_ENTRY = (By.XPATH, '//div[contains(@class, "dns-records-bar__action-icon")]//'
+                                           '*[local-name()="svg" and @id="add"]')  # кнопка добавить ДНС запись
     # DOMAIN_TITLE = (By.XPATH, '')
 
