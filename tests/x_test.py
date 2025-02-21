@@ -2,6 +2,8 @@ import time
 import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import Auth
@@ -59,12 +61,33 @@ def test_x(pre_post_dns, browser):
         domains_count = int(''.join([i for i in order_page.find_elem(order_page.DOMAIN_TITLE).text if i.isdigit()]))
         assert domains_count, 'Не указано количество доменов в заголовке'
         assert domains_count > 0, 'Не указано количество доменов в заголовке'
-        order_page.click(order_page.DOMAIN_ORDER_DROPDOWN)
-        order_page.click(order_page.DOMAIN_ORDER_ADD_AN_ENTRY)
+
         time.sleep(3)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Найденный заказ',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Добавление записи DNS Типа A'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.click(order_page.DOMAIN_ORDER_DROPDOWN)
+        order_page.click(order_page.DOMAIN_ORDER_ADD_AN_ENTRY)
+        assert order_page.wait_for_page_loaded(order_page.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
+        order_page.click(order_page.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
+        order_page.click(order_page.DOMAIN_ENTRY_SELECT)
+        order_page.click(order_page.DOMAIN_ENTRY_SELECT_TYPE_A)
+        order_page.type(order_page.DOMAIN_ENTRY_TYPE_A_HOST, 'www')
+        order_page.type(order_page.DOMAIN_ENTRY_TYPE_A_IP, '1.1.1.1')
+        order_page.click(order_page.DOMAIN_ENTRY_ADD_BUTTON)
+        WebDriverWait(order_page.browser, 30).until(
+            EC.invisibility_of_element(orders_page.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
+        time.sleep(3)
+
+        allure.attach(
+            body=main_page.browser.get_screenshot_as_png(),
+            name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
 

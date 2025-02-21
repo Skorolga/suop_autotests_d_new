@@ -55,7 +55,8 @@ class BasicPage(object):
 
     def click(self, locator:tuple[str, str], timeout=timeout):
         """Находит и кликает по элементу"""
-        element = self.find_elem(locator, timeout)
+        # element = self.find_elem(locator, timeout)
+        element = WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
         if element:
             try:
                 element.click()
@@ -65,9 +66,11 @@ class BasicPage(object):
                 logger.info(f'Видимость элемента: {element.is_displayed()}')
                 try:
                     self.scroll_to_element(element)
+                    element.click()
+                    logger.info(f'Клик по элементу после скролла: {locator[1]}')
                 except Exception as error:
                     logger.info(f'Не удалось проскролить до элемента {locator[1]}')
-                self.browser.execute_script('arguments[0].click();', element)  # кликаем если элемент есть но кликнуть штатно не получилось
+                    self.browser.execute_script('arguments[0].click();', element)  # кликаем если элемент есть, но кликнуть штатно не получилось
 
     def page_has_loaded(self):
         page_state = self.browser.execute_script('return document.readyState;')
