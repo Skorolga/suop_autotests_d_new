@@ -1,3 +1,4 @@
 selenium
 allure-pytest
 python-dotenv
+pytest-repeat
