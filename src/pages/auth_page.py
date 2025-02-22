@@ -18,17 +18,17 @@ class Auth(BasicPage):
 
     # Модальное окно выбора организации
     AUTH_MODAL_PAGINATION_NEXT = (By.XPATH, '//li[@class="pagination__next"]')
-    AUTH_MODAL_MAIN_TABLE = (By.XPATH, '//table/tbody[contains(@class, "table-body")]')  # для ожидания загрузки
+    AUTH_MODAL_MAIN_TABLE = (By.XPATH, '//table/tbody[contains(@class, "table-body")]')  # Для ожидания загрузки
 
     # Остальные локаторы
-    CAB_AVATAR = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # выпадающее меню профиля
+    CAB_AVATAR = (By.XPATH, '//a[contains(@class, "cab cab--select")]')  # Выпадающее меню профиля
     LOGOUT_PROFILE_MENU = (By.XPATH, '//p[contains(text(), "Выход")]')
     MENU_CHANGE_ROLE = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
     ADMIN_SUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
-    PROFILE_NAME_ADMIN = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # для проверки выбора роли Администратор СУ ОП
-    PROFILE_NAME_MANAGER = (By.XPATH, '//p[text()="ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами"]')  # для проверки выбора роли Администратор СУ ОП
-    PROFILE_NAME_CLIENT = (By.XPATH, '''//p[text()='ООО "ТЦИ"']''')  # для проверки выбора роли Клиента
+    PROFILE_NAME_ADMIN = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # Для проверки выбора роли Администратор СУ ОП
+    PROFILE_NAME_MANAGER = (By.XPATH, f'//p[text()="{SUOP.ORGANIZATION_MANAGER}"]')  # Для проверки выбора роли менеджер
+    PROFILE_NAME_CLIENT = (By.XPATH, f'''//p[text()='{SUOP.ORGANIZATION_CLIENT}']''')  # Для проверки выбора роли Клиента
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
@@ -44,7 +44,7 @@ class Auth(BasicPage):
             self.click(self.CAB_AVATAR)
             self.click(self.MENU_CHANGE_ROLE)
         else:
-            self.click(MainPage.LK_BUTTON)  # переходим на главную форму авторизации из главной
+            self.click(MainPage.LK_BUTTON)  # Переходим на главную форму авторизации из главной
             self.wait_for_page_loaded(self.LOGIN_FORM)
             self.type(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
             self.type(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
