@@ -52,6 +52,7 @@ class BasicPage(object):
     def scroll_to_element(self, element):
         logger.info(f'Скроллим до элемента: {element}')
         self.browser.execute_script("arguments[0].scrollIntoView();", element)
+        time.sleep(2)  # ждем завершение анимации скролла
 
     def click(self, locator:tuple[str, str], timeout=timeout):
         """Находит и кликает по элементу"""
