@@ -9,19 +9,19 @@ from src.logger.formatted_logger import logger
 
 
 class OrdersPage(BasicPage):
-    """Класс описывает страницу с заказами в личном кабинете"""
+    """Класс описывает страницу с заказами в личном кабинете клиента"""
 
     FILTER_CLEAN_BUTTON = (By.XPATH, '//button[contains(text(), "Очистить все")]')
     FILTER_FOR_FIND_ORDERS = (By.XPATH, '//header/div[contains(@class,"btn-wrapper--single-icon")]/button')
     FILTER_INPUT_ID_ORDER = (By.XPATH, '//input[@name="id"]')
     FILTER_FORM_APPLY_BUTTON = (By.XPATH, '//button[contains(text(), "Применить")]')
 
-    # создание заказа
+    # Создание заказа
     ORDER_PARAM_TAB = (By.XPATH, '//button[contains(text(), "Параметры и ограничения")]')
     ORDER_BUTTON_APPROVE_MANAGER = (By.XPATH, '//button[contains(text(), "Согласовать перевод заказа в тестовый режим")]')
     ORDER_BUTTON_APPROVE_MANAGER_2 = (By.XPATH, '//button[contains(text(), "Перевести в тестовый режим")]')  # Еще раз подтверждаем согласование заказа
 
-    # заказ
+    # Заказ
     ORDER_STATUS = (By.XPATH, '//div[contains(@class, "statusText")]')
     ORDER_STATUS_CHANGE = (By.XPATH, '//div[contains(text(), "Изменение объема ресурсов")]')
     ORDER_STATUS_READY = (By.XPATH, '//div[contains(text(), "Работает")]')
@@ -47,7 +47,8 @@ class OrdersPage(BasicPage):
     def find_order(self, num_order:str, clear_filter=True):
         """
         Находит заказ по номеру.
-        clear_filter под клиентом нет кнопки "Очистить все"
+        clear_filter под клиентом нет кнопки "Очистить все" если нет созданных заказов
+        Под клиентом, когда заказ ищется через поиск его нужно дополнительно открывать в отличие от админа и менеджера
         """
         # self.browser.refresh()
         if clear_filter:

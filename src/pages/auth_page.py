@@ -3,6 +3,10 @@ import time
 import allure
 from allure_commons.types import AttachmentType
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+from src.logger.formatted_logger import logger
 from src.pages.basic_page import BasicPage
 from src.pages.main_page import MainPage
 from config.config import SUOP
@@ -64,7 +68,7 @@ class Auth(BasicPage):
             # Если это не первая авторизация сначала переходим на страницу выбора организации
             self.click(self.CAB_AVATAR)
             self.click(self.MENU_CHANGE_ROLE)
-        self.select_role('Администраторы СУ ОП')
+        self.select_role(SUOP.ORGANIZATION_ADMIN)
         self.wait_for_page_loaded(self.PROFILE_NAME_ADMIN)
         time.sleep(3)
 
@@ -74,11 +78,11 @@ class Auth(BasicPage):
             # Если это не первая авторизация сначала переходим на страницу выбора организации
             self.click(self.CAB_AVATAR)
             self.click(self.MENU_CHANGE_ROLE)
-        self.select_role('ООО «ЦХД» B2B Менеджер по продажам и по работе с клиентами')
+        self.select_role(SUOP.ORGANIZATION_MANAGER)
         self.wait_for_page_loaded(self.PROFILE_NAME_MANAGER)
         time.sleep(3)
 
-    def select_role(self, role:str):
+    def select_role_(self, role:str):
         """Выбирает роль (организацию) по названию"""
         el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
         self.wait_for_page_loaded(self.AUTH_MODAL_MAIN_TABLE)
@@ -88,6 +92,35 @@ class Auth(BasicPage):
             # TODO доделать перебор пагинации (сделать когда снимут ограничение в 2 сессии)
             self.click(self.AUTH_MODAL_PAGINATION_NEXT)
             self.click(el_constructor)
+
+    def select_role(self, role:str) -> bool:
+        """Выбирает роль (организацию) по названию"""
+        el_constructor = (By.XPATH, f"""//div[contains(text(), '{role}')]""")  # f-строка с двойными кавычками в названии!
+        self.wait_for_page_loaded(self.AUTH_MODAL_MAIN_TABLE)
+        try:
+            self.click(el_constructor, 2)
+            return True
+        except Exception as E:
+            logger.info('Обходим страницы пагинации')
+        next_page = WebDriverWait(self.browser, 5).until(EC.presence_of_element_located(self.AUTH_MODAL_PAGINATION_NEXT))
+        i = 0
+        while next_page:
+            i += 1
+            try:
+                self.click(self.AUTH_MODAL_PAGINATION_NEXT, 1)
+                self.click(el_constructor, 1)
+                logger.info(f'Роль {role} найдена на странице: {i}')
+                return True
+            except Exception as E:
+                try:
+                    next_page = WebDriverWait(self.browser, 2).until(
+                        EC.presence_of_element_located(self.AUTH_MODAL_PAGINATION_NEXT))
+                    logger.info(f'Переходим страницу пагинации: {i + 1}')
+                except Exception as E:
+                    next_page = False
+                    logger.error(f'Роль {role} не найдена. Пройдено страниц пагинации: {i} next_page {bool(next_page)}')
+        return False
+
 
     def logout(self):
         """Выход из учетной записи"""

@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 
 
-dotenv_path = Path('./.env2')
+dotenv_path = Path('./.env')
 load_dotenv(dotenv_path=dotenv_path, override=True)
 
 
@@ -16,3 +16,4 @@ class SUOP:
     CLIENT_PASSWORD = os.getenv('CLIENT_PASSWORD')
     ORGANIZATION_CLIENT = os.getenv('ORGANIZATION_CLIENT')
     ORGANIZATION_MANAGER = os.getenv('ORGANIZATION_MANAGER')
+    ORGANIZATION_ADMIN = os.getenv('ORGANIZATION_ADMIN')
