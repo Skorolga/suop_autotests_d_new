@@ -44,7 +44,7 @@ def test_del(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num1 = '120853'
+    order_num1 = '121336'
 
     step_name = 'Поиск заказа за клиента'
     with allure.step(step_name):

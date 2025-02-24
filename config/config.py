@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 
 
-dotenv_path = Path('./.env')
+dotenv_path = Path('./.env2')
 load_dotenv(dotenv_path=dotenv_path, override=True)
 
 
