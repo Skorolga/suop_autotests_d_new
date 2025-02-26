@@ -1,9 +1,5 @@
-import time
 import allure
 from allure_commons.types import AttachmentType
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
@@ -48,16 +44,31 @@ def test_x(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
     order_num = '121336'
+    domain = 'autotest'
 
     step_name = 'Добавление поддомена'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         orders_page.find_order(order_num)
-        order_page.add_sub_domain('qa')
+        order_page.add_sub_domain(domain)
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
 
     step_name = 'Добавление записи DNS Типа A'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_a()
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа А',
+            attachment_type=AttachmentType.PNG
+        )
 
+    step_name = 'Удаление домена'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.del_sub_domain(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name=step_name,
+            attachment_type=AttachmentType.PNG
+        )

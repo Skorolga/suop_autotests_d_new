@@ -1,5 +1,4 @@
 import time
-from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -7,8 +6,6 @@ import allure
 from allure_commons.types import AttachmentType
 from src.pages.basic_page import BasicPage
 from src.pages.orders_page import OrdersPage
-from src.pages.client_page import ClientPage
-from src.logger.formatted_logger import logger
 
 
 class OrderPage(BasicPage):
@@ -23,7 +20,9 @@ class OrderPage(BasicPage):
     DOMAIN_ADD_SELECT = (By.XPATH, '//div[contains(@class, "select__value-container select__value-container--has-value")]')
     DOMAIN_ADD_SELECT_VALUE = (By.XPATH, '//div[contains(@id, "option-1")]')  # Выпадающее меню, выбор поддомена
     DOMAIN_ADD_INPUT = (By.XPATH, '//input[contains(@name, "domain") and @class="input-element"]')  # Кнопка добавления домена (Заказать)
+    DOMAIN_DEL_BUTTON_YES = (By.XPATH, '//button[text()="Да"]')  # Кнопка удаления домена
     DOMAIN_TITLE = (By.XPATH, '//div[@class="section-title section-title--left"]')
+
     DOMAIN_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[4]')
     DOMAIN_ORDER_ADD_AN_ENTRY = (By.XPATH, '//div[contains(@class, "dns-records-bar__actions-wrapper")]//*[3]')  # Кнопка добавить ДНС запись
     DOMAIN_ENTRY_TITLE = (By.XPATH, '//div[contains(text(), "DNS записи")]')  # Для проверки загрузки настройки домена
@@ -32,6 +31,8 @@ class OrderPage(BasicPage):
     DOMAIN_ENTRY_TYPE_A_HOST = (By.XPATH, '//input[contains(@name, "owner") and @class="input-element"]')  # Поле ввода хост
     DOMAIN_ENTRY_TYPE_A_IP = (By.XPATH, '//input[contains(@name, "rdata[ipv4addr]") and @class="input-element"]')  # Поле ввода ip
     DOMAIN_ENTRY_ADD_BUTTON = (By.XPATH, '//button[@type="button" and text()="Добавить"]')  # Кнопка добавить запись
+
+
     # DOMAIN_TITLE = (By.XPATH, '')
 
     def add_sub_domain(self, sub_domain):
@@ -66,8 +67,9 @@ class OrderPage(BasicPage):
         WebDriverWait(self.browser, 30).until(
             EC.invisibility_of_element(
                 OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
-        allure.attach(
-            body=self.browser.get_screenshot_as_png(),
-            name='DNS запись типа А',
-            attachment_type=AttachmentType.PNG
-        )
+
+    def del_sub_domain(self, sub_domain):
+        DEL_SUB_DOMAIN = (By.XPATH, f'//td[contains(text(), "{sub_domain}")]/following::td[2]/div')
+        self.click(DEL_SUB_DOMAIN)
+        self.click(self.DOMAIN_DEL_BUTTON_YES)
+        assert self.wait_for_page_loaded(self.DOMAIN_ADD_BUTTON)  # Ждем удаления домена
