@@ -72,11 +72,11 @@ class OrdersPage(BasicPage):
         profile = self.find_elem(AuthPage.PROFILE_NAME, 5)
         # logger.info(f'{profile.text} == {SUOP.ORGANIZATION_CLIENT}')
         if type(profile) != bool and profile.text == SUOP.ORGANIZATION_CLIENT:
-            logger.info('Поиск был произведен под клиентом, дополнительно открываем заказ')
             # Если заказ ищется под клиентом его нужно дополнительно раскрыть, т.к. у клиента заказ выглядит иначе
             self.click(composite_locator)
             self.wait_for_page_loaded(ClientPage.VIRT_MACH_TITLE)
         else:
+            # Заказ ищется за менеджера или клиента, ждем загрузки информации (активный таб заголовок)
             self.wait_for_page_loaded(self.ORDER_INFO_TITLE)
 
     def approve_order(self, num_order):
