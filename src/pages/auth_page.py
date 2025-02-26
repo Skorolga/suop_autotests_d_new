@@ -12,7 +12,7 @@ from src.pages.main_page import MainPage
 from config.config import SUOP
 
 
-class Auth(BasicPage):
+class AuthPage(BasicPage):
     """Класс описывающий авторизацию и выбор роли (организации)"""
 
     # Форма авторизации
@@ -29,10 +29,12 @@ class Auth(BasicPage):
     LOGOUT_PROFILE_MENU = (By.XPATH, '//p[contains(text(), "Выход")]')
     MENU_CHANGE_ROLE = (By.XPATH, '//p[contains(text(), "Сменить организацию")]')
 
-    ADMIN_SUOP = (By.XPATH, '//div[contains(text(), "Администраторы СУ ОП")]')
-    PROFILE_NAME_ADMIN = (By.XPATH, '//p[text()="Администраторы СУ ОП"]')  # Для проверки выбора роли Администратор СУ ОП
+    ADMIN_SUOP = (By.XPATH, f'//div[contains(text(), "{SUOP.ORGANIZATION_ADMIN}")]')
+    PROFILE_NAME_ADMIN = (By.XPATH, f'//p[text()="{SUOP.ORGANIZATION_ADMIN}"]')  # Для проверки выбора роли Администратор СУ ОП
     PROFILE_NAME_MANAGER = (By.XPATH, f'//p[text()="{SUOP.ORGANIZATION_MANAGER}"]')  # Для проверки выбора роли менеджер
     PROFILE_NAME_CLIENT = (By.XPATH, f'''//p[text()='{SUOP.ORGANIZATION_CLIENT}']''')  # Для проверки выбора роли Клиента
+    PROFILE_NAME = (By.XPATH, f'''//div[@class="wrapper--profile"]//div[@class="text"]//div//p[contains(@class, "grLHgo")]''')  # Для получения имени организации
+
 
     def __init__(self, browser, url=None):
         super().__init__(browser)
@@ -120,7 +122,6 @@ class Auth(BasicPage):
                     next_page = False
                     logger.error(f'Роль {role} не найдена. Пройдено страниц пагинации: {i} next_page {bool(next_page)}')
         return False
-
 
     def logout(self):
         """Выход из учетной записи"""

@@ -6,7 +6,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pytest
 from src.pages.main_page import MainPage
-from src.pages.auth_page import Auth
+from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
 from src.pages.order_page import OrderPage
@@ -25,7 +25,7 @@ def test_x(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
-    auth_page = Auth(browser)
+    auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
     order_page = OrderPage(browser)
@@ -52,9 +52,7 @@ def test_x(pre_post_dns, browser):
     step_name = 'Добавление поддомена'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        orders_page.find_order(order_num, clear_filter=False)
-        composite_locator = (By.XPATH, f'//td[contains(text(),"{order_num}")]')
-        orders_page.click(composite_locator)  # Открываем заказ
+        orders_page.find_order(order_num)
         order_page.add_sub_domain('qa')
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
 

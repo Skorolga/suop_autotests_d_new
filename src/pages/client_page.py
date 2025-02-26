@@ -13,15 +13,15 @@ class ClientPage(BasicPage):
     MENU_MAKE_ORDER = (By.XPATH, '//span[contains(text(), "Заказать услугу")]')
     BANNER_MAKE_ORDER = (By.XPATH, '//h4[contains(text(), "Виртуальная инфраструктура")]')
     BUTTON_MAKE_ORDER = (By.XPATH, '//button[contains(text(), "Заказать")]')
-    TABLE_WITH_ORDERS_IN_LK = (By.XPATH, '//div[contains(@class, "items-table__dropdown")]')  # проверка загрузки стр. с заказами
+    TABLE_WITH_ORDERS_IN_LK = (By.XPATH, '//div[contains(@class, "items-table__dropdown")]')  # Проверка загрузки стр. с заказами
 
     # локаторы заказа за клиента
     FORM_TITLE_CONF = (By.XPATH, '//h3[contains(text(), "Конфигурация")]')  # Для проверки загрузки страницы с формой заказа iaas
     COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')
     SUBMIT_BUTTON = (By.XPATH, '//button[@type="submit"]')  # Кнопка заказать
-    NEW_ORDER_NUM = (By.XPATH, "//p[contains(text(), '№')]")  # локатор модального окна с номером созданного заказа
+    NEW_ORDER_NUM = (By.XPATH, "//p[contains(text(), '№')]")  # Локатор модального окна с номером созданного заказа
     GO_TO_ORDER = (By.XPATH, "//button[contains(text(), 'К заказу')]")  # Кнопка для перехода к заказу из модального окна при создании нового заказа
-    VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # заголовок в заказе для ожидания загрузки страницы
+    VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # Заголовок в заказе для ожидания загрузки страницы
 
     def __init__(self, browser):
         super().__init__(browser)
