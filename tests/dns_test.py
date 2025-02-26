@@ -5,7 +5,7 @@ import allure
 from allure_commons.types import AttachmentType
 import pytest
 from src.pages.main_page import MainPage
-from src.pages.auth_page import Auth
+from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
 from config.config import SUOP
@@ -25,7 +25,7 @@ def test_dns(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
-    auth_page = Auth(browser)
+    auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
 

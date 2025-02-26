@@ -1,11 +1,8 @@
-import time
-from asyncio import timeout
-
 import allure
 from allure_commons.types import AttachmentType
 import pytest
 from src.pages.main_page import MainPage
-from src.pages.auth_page import Auth
+from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
 from config.config import SUOP
@@ -23,7 +20,7 @@ def test_del(pre_post_dns, browser):
     """Тест DNS СУ ОП"""
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
-    auth_page = Auth(browser)
+    auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
 
@@ -51,7 +48,7 @@ def test_del(pre_post_dns, browser):
         logger.info('Шаг: ' + step_name)
         auth_page.auth_as_client()
         orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-        orders_page.find_order(order_num1, clear_filter=False)
+        orders_page.find_order(order_num1)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Найденный заказ за клиента',

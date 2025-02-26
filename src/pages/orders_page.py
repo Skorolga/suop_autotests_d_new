@@ -5,7 +5,10 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from src.pages.basic_page import BasicPage
 from src.pages.client_page import ClientPage
+from src.pages.auth_page import AuthPage
+from config.config import SUOP
 from src.logger.formatted_logger import logger
+
 
 
 class OrdersPage(BasicPage):
@@ -44,15 +47,15 @@ class OrdersPage(BasicPage):
     def __init__(self, browser):
         super().__init__(browser)
 
-    def find_order(self, num_order:str, clear_filter=True):
+    def find_order(self, num_order:str):
         """
-        Находит заказ по номеру.
+        Находит заказ по номеру и открывает его.
         clear_filter под клиентом нет кнопки "Очистить все" если нет созданных заказов
-        Под клиентом, когда заказ ищется через поиск его нужно дополнительно открывать в отличие от админа и менеджера
+        Под клиентом, через поиск заказ нужно дополнительно открывать в отличие от админа и менеджера
         """
-        # self.browser.refresh()
-        if clear_filter:
-            self.click(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов
+
+        if self.wait_for_page_loaded(self.FILTER_CLEAN_BUTTON, 3):
+            self.click(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов (если он есть)
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         time.sleep(2)
         self.click(self.FILTER_FOR_FIND_ORDERS)
@@ -64,6 +67,13 @@ class OrdersPage(BasicPage):
         composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")] | '
                                        f'//td[contains(text(),"{num_order}")]')
         self.wait_for_page_loaded(composite_locator, 15)  # TODO локаторы клиента и администратора отличаются (под клиентом верстка элемента в <table>)
+        profile = self.find_elem(AuthPage.PROFILE_NAME, 5)
+        # logger.info(f'{profile.text} == {SUOP.ORGANIZATION_CLIENT}')
+        if type(profile) != bool and profile.text == SUOP.ORGANIZATION_CLIENT:
+            logger.info('Поиск был произведен под клиентом, дополнительно открываем заказ')
+            # Если заказ ищется под клиентом его нужно дополнительно раскрыть, т.к. у клиента заказ выглядит иначе
+            self.click(composite_locator)
+            self.wait_for_page_loaded(ClientPage.VIRT_MACH_TITLE)
 
     def approve_order(self, num_order):
         """Согласовывает заказ за менеджера"""
