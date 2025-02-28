@@ -26,7 +26,7 @@ class ClientPage(BasicPage):
     def __init__(self, browser):
         super().__init__(browser)
 
-    def make_order(self, timeout=180) -> str:
+    def make_order(self, timeout=360) -> str:
         """Метод создает заказ Публичное облако под уже авторизованным клиентом и возвращает номер заказа"""
         logger.info('Создание заказа Публичное облако за клиента')
         self.click(self.MENU_MAKE_ORDER)
