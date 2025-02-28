@@ -57,13 +57,13 @@ class BasicPage(object):
     def click(self, locator:tuple[str, str], timeout=timeout):
         """Находит и кликает по элементу"""
         # element = self.find_elem(locator, timeout)
-        element = WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located(locator))
+        element = WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable(locator))
         if element:
             try:
                 element.click()
                 logger.info(f'Клик по элементу: {locator[1]}')
             except Exception as error:
-                logger.warning(f'Не удалось кликнуть по элементу {locator[1]}. Ошибка в методе click_on_element')
+                logger.warning(f'Элемент {locator[1]} не виден. Метод: click())')
                 logger.info(f'Видимость элемента: {element.is_displayed()}')
                 try:
                     self.scroll_to_element(element)
