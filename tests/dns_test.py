@@ -8,6 +8,7 @@ from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
+from src.pages.order_page import OrderPage
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 
@@ -28,6 +29,7 @@ def test_dns(pre_post_dns, browser):
     auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
+    order_page = OrderPage(browser)
 
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
@@ -101,6 +103,34 @@ def test_dns(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
+    domain = 'autotest'
+    step_name = 'Добавление поддомена'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.auth_as_client()
+        orders_page.find_order(order_num)
+        order_page.add_sub_domain(domain)
+        order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
+
+    step_name = 'Добавление записи DNS Типа A'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_a()
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа А',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Удаление домена'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.del_sub_domain(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name=step_name,
+            attachment_type=AttachmentType.PNG
+        )
 
     step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):
