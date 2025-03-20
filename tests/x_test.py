@@ -43,7 +43,7 @@ def test_x(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num = '121336'
+    order_num = '124164'
     domain = 'autotest'
 
     step_name = 'Добавление поддомена'
@@ -52,6 +52,16 @@ def test_x(pre_post_dns, browser):
         orders_page.find_order(order_num)
         order_page.add_sub_domain(domain)
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
+
+    step_name = 'Добавление записи DNS Типа CNAME'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_cname(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа CNAME',
+            attachment_type=AttachmentType.PNG
+        )
 
     step_name = 'Добавление записи DNS Типа A'
     with allure.step(step_name):
