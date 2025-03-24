@@ -63,6 +63,16 @@ def test_x(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
+    step_name = 'Добавление записи DNS типа MX'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_mx(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа CNAME',
+            attachment_type=AttachmentType.PNG
+        )
+
     step_name = 'Добавление записи DNS типа A'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
