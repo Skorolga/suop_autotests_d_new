@@ -17,6 +17,7 @@ class ClientPage(BasicPage):
 
     # локаторы заказа за клиента
     FORM_TITLE_CONF = (By.XPATH, '//h3[contains(text(), "Конфигурация")]')  # Для проверки загрузки страницы с формой заказа iaas
+    RADIOBUTTON_NEW_ORDER = (By.XPATH, '//div[contains(text(), "Создать новый заказ")]')  # Радиобаттон создать iaas в новом заказе
     COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')
     SUBMIT_BUTTON = (By.XPATH, '//button[@type="submit"]')  # Кнопка заказать
     NEW_ORDER_NUM = (By.XPATH, "//p[contains(text(), '№')]")  # Локатор модального окна с номером созданного заказа
@@ -34,6 +35,7 @@ class ClientPage(BasicPage):
         self.click(self.BANNER_MAKE_ORDER)
         self.click(self.BUTTON_MAKE_ORDER)
         self.wait_for_page_loaded(self.FORM_TITLE_CONF)
+        self.click(self.RADIOBUTTON_NEW_ORDER)  # Радиокнопка для создания iaas в новом заказе
         # проверяем начисление
         cost = self.check_cost(self.COST_WITHOUT_TAX)
         logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
