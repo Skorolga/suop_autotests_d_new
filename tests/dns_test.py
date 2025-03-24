@@ -112,6 +112,16 @@ def test_dns(pre_post_dns, browser):
         order_page.add_sub_domain(domain)
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
 
+    step_name = 'Добавление записи DNS типа CNAME'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_cname(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа CNAME',
+            attachment_type=AttachmentType.PNG
+        )
+
     step_name = 'Добавление записи DNS Типа A'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
@@ -119,6 +129,36 @@ def test_dns(pre_post_dns, browser):
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
             name='DNS запись типа А',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Добавление записи DNS типа MX'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_mx(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name='DNS запись типа CNAME',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Добавление записи DNS типа SRV'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_srv(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name=step_name,
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = 'Добавление записи DNS типа TXT'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.add_dns_entry_txt(domain)
+        allure.attach(
+            body=order_page.browser.get_screenshot_as_png(),
+            name=step_name,
             attachment_type=AttachmentType.PNG
         )
 
