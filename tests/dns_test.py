@@ -112,7 +112,7 @@ def test_dns(pre_post_dns, browser):
         order_page.add_sub_domain(domain)
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
 
-    step_name = 'Добавление записи DNS типа CNAME'
+    step_name = 'Добавление DNS записи типа CNAME'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_cname(domain)
@@ -122,7 +122,7 @@ def test_dns(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS Типа A'
+    step_name = 'Добавление DNS записи Типа A'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_a()
@@ -132,7 +132,7 @@ def test_dns(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа MX'
+    step_name = 'Добавление DNS записи типа MX'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_mx(domain)
@@ -142,23 +142,23 @@ def test_dns(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа SRV'
+    step_name = 'Добавление DNS записи типа SRV'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_srv(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name=step_name,
+            name='DNS запись типа SRV',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа TXT'
+    step_name = 'Добавление DNS записи типа TXT'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_txt(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name=step_name,
+            name='DNS запись типа TXT',
             attachment_type=AttachmentType.PNG
         )
 
@@ -168,7 +168,7 @@ def test_dns(pre_post_dns, browser):
         order_page.del_sub_domain(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name=step_name,
+            name='Удаленный домен отсутствует',
             attachment_type=AttachmentType.PNG
         )
 
