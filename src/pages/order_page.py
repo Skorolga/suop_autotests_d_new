@@ -29,15 +29,18 @@ class OrderPage(BasicPage):
     DOMAIN_ENTRY_SELECT = (By.XPATH, '//div[contains(@class, "select__value-container")]')  # Выпадающее меню "Тип записи"
     DOMAIN_ENTRY_SELECT_TYPE_A = (By.XPATH, '//div[contains(@id, "option") and text()="A"]')  # Тип А в выпадающем меню
     DOMAIN_ENTRY_SELECT_TYPE_MX = (By.XPATH, '//div[contains(@id, "option") and text()="MX"]')  # Тип MX в выпадающем меню
+    DOMAIN_ENTRY_SELECT_TYPE_SRV = (By.XPATH, '//div[contains(@id, "option") and text()="SRV"]')  # Тип SRV в выпадающем меню
     DOMAIN_ENTRY_TYPE_A_HOST = (By.XPATH, '//input[contains(@name, "owner") and @class="input-element"]')  # Поле ввода хост
     DOMAIN_ENTRY_TYPE_A_IP = (By.XPATH, '//input[contains(@name, "rdata[ipv4addr]") and @class="input-element"]')  # Поле ввода ip
     DOMAIN_ENTRY_ADD_BUTTON = (By.XPATH, '//button[@type="button" and text()="Добавить"]')  # Кнопка добавить запись
     DOMAIN_ENTRY_TYPE_CNAME = (By.XPATH, '//input[contains(@name, "rdata[name]") and @class="input-element"]')  # Поле ввода поля "Хост назначения"
     DOMAIN_ENTRY_TYPE_MX_P = (By.XPATH, '//input[contains(@name, "rdata[preference]") and @class="input-element"]')  # Поле ввода поля "Приоритет"
     DOMAIN_ENTRY_TYPE_MX_HOST_DEST = (By.XPATH, '//input[contains(@name, "rdata[mail_exchanger]") and @class="input-element"]')  # Поле ввода поля "Хост назначения"
+    DOMAIN_ENTRY_TYPE_SRV_HOST_DEST = (By.XPATH, '//input[contains(@name, "rdata[target]") and @class="input-element"]')  # Поле ввода поля "Хост назначения SRV"
+    DOMAIN_ENTRY_TYPE_SRV_PORT = (By.XPATH, '//input[contains(@name, "rdata[port]") and @class="input-element"]')  # Поле ввода "Порт"
+    DOMAIN_ENTRY_TYPE_SRV_WEIGHT = (By.XPATH, '//input[contains(@name, "rdata[weight]") and @class="input-element"]')  # Поле ввода "Вес"
+    DOMAIN_ENTRY_TYPE_SRV_PRIORITY = (By.XPATH, '//input[contains(@name, "rdata[priority]") and @class="input-element"]')  # Поле ввода "Приоритет"
 
-
-    # DOMAIN_TITLE = (By.XPATH, '')
 
     def add_sub_domain(self, sub_domain):
         """Добавляет поддомен в домен cloud.rt-dc.ru"""
@@ -83,6 +86,23 @@ class OrderPage(BasicPage):
         self.type(self.DOMAIN_ENTRY_TYPE_A_HOST, sub_domain)
         self.type(self.DOMAIN_ENTRY_TYPE_MX_P, '10')  # Поле приоритет
         self.type(self.DOMAIN_ENTRY_TYPE_MX_HOST_DEST, 'mail.host.local')  # Поле приоритет
+        self.click(self.DOMAIN_ENTRY_ADD_BUTTON)
+        WebDriverWait(self.browser, 30).until(
+            EC.invisibility_of_element(
+                OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
+
+    def add_dns_entry_srv(self, sub_domain):
+        """Добавляет DNS запись типа SRV (настройки для отдельных протоколов, например SIP)"""
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)
+        assert self.wait_for_page_loaded(self.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
+        self.click(self.DOMAIN_ENTRY_SELECT)
+        self.click(self.DOMAIN_ENTRY_SELECT_TYPE_SRV)
+        self.type(self.DOMAIN_ENTRY_TYPE_A_HOST, sub_domain)
+        self.type(self.DOMAIN_ENTRY_TYPE_SRV_HOST_DEST, 'target.host.local')  # Поле "Хост назначения"
+        self.type(self.DOMAIN_ENTRY_TYPE_SRV_PORT, '8080')  # Поле приоритет
+        self.type(self.DOMAIN_ENTRY_TYPE_SRV_WEIGHT, '10')
+        self.type(self.DOMAIN_ENTRY_TYPE_SRV_PRIORITY, '50')
         self.click(self.DOMAIN_ENTRY_ADD_BUTTON)
         WebDriverWait(self.browser, 30).until(
             EC.invisibility_of_element(
