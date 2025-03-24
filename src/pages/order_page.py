@@ -30,6 +30,7 @@ class OrderPage(BasicPage):
     DOMAIN_ENTRY_SELECT_TYPE_A = (By.XPATH, '//div[contains(@id, "option") and text()="A"]')  # Тип А в выпадающем меню
     DOMAIN_ENTRY_SELECT_TYPE_MX = (By.XPATH, '//div[contains(@id, "option") and text()="MX"]')  # Тип MX в выпадающем меню
     DOMAIN_ENTRY_SELECT_TYPE_SRV = (By.XPATH, '//div[contains(@id, "option") and text()="SRV"]')  # Тип SRV в выпадающем меню
+    DOMAIN_ENTRY_SELECT_TYPE_TXT = (By.XPATH, '//div[contains(@id, "option") and text()="TXT"]')  # Тип TXT в выпадающем меню
     DOMAIN_ENTRY_TYPE_A_HOST = (By.XPATH, '//input[contains(@name, "owner") and @class="input-element"]')  # Поле ввода хост
     DOMAIN_ENTRY_TYPE_A_IP = (By.XPATH, '//input[contains(@name, "rdata[ipv4addr]") and @class="input-element"]')  # Поле ввода ip
     DOMAIN_ENTRY_ADD_BUTTON = (By.XPATH, '//button[@type="button" and text()="Добавить"]')  # Кнопка добавить запись
@@ -40,6 +41,7 @@ class OrderPage(BasicPage):
     DOMAIN_ENTRY_TYPE_SRV_PORT = (By.XPATH, '//input[contains(@name, "rdata[port]") and @class="input-element"]')  # Поле ввода "Порт"
     DOMAIN_ENTRY_TYPE_SRV_WEIGHT = (By.XPATH, '//input[contains(@name, "rdata[weight]") and @class="input-element"]')  # Поле ввода "Вес"
     DOMAIN_ENTRY_TYPE_SRV_PRIORITY = (By.XPATH, '//input[contains(@name, "rdata[priority]") and @class="input-element"]')  # Поле ввода "Приоритет"
+    DOMAIN_ENTRY_TYPE_TXT = (By.XPATH, '//textarea[contains(@name, "rdata[text]")]')  # Поле ввода текста для TXT
 
 
     def add_sub_domain(self, sub_domain):
@@ -103,6 +105,20 @@ class OrderPage(BasicPage):
         self.type(self.DOMAIN_ENTRY_TYPE_SRV_PORT, '8080')  # Поле приоритет
         self.type(self.DOMAIN_ENTRY_TYPE_SRV_WEIGHT, '10')
         self.type(self.DOMAIN_ENTRY_TYPE_SRV_PRIORITY, '50')
+        self.click(self.DOMAIN_ENTRY_ADD_BUTTON)
+        WebDriverWait(self.browser, 30).until(
+            EC.invisibility_of_element(
+                OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
+
+    def add_dns_entry_txt(self, sub_domain):
+        """Добавляет DNS запись типа TXT"""
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)
+        assert self.wait_for_page_loaded(self.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
+        self.click(self.DOMAIN_ENTRY_SELECT)
+        self.click(self.DOMAIN_ENTRY_SELECT_TYPE_TXT)
+        self.type(self.DOMAIN_ENTRY_TYPE_A_HOST, sub_domain)
+        self.type(self.DOMAIN_ENTRY_TYPE_TXT, 'text for TXT entries text for TXT entries text for TXT entries ')
         self.click(self.DOMAIN_ENTRY_ADD_BUTTON)
         WebDriverWait(self.browser, 30).until(
             EC.invisibility_of_element(
