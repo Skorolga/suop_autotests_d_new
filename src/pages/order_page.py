@@ -28,10 +28,13 @@ class OrderPage(BasicPage):
     DOMAIN_ENTRY_TITLE = (By.XPATH, '//div[contains(text(), "DNS записи")]')  # Для проверки загрузки настройки домена
     DOMAIN_ENTRY_SELECT = (By.XPATH, '//div[contains(@class, "select__value-container")]')  # Выпадающее меню "Тип записи"
     DOMAIN_ENTRY_SELECT_TYPE_A = (By.XPATH, '//div[contains(@id, "option") and text()="A"]')  # Тип А в выпадающем меню
+    DOMAIN_ENTRY_SELECT_TYPE_MX = (By.XPATH, '//div[contains(@id, "option") and text()="MX"]')  # Тип MX в выпадающем меню
     DOMAIN_ENTRY_TYPE_A_HOST = (By.XPATH, '//input[contains(@name, "owner") and @class="input-element"]')  # Поле ввода хост
     DOMAIN_ENTRY_TYPE_A_IP = (By.XPATH, '//input[contains(@name, "rdata[ipv4addr]") and @class="input-element"]')  # Поле ввода ip
     DOMAIN_ENTRY_ADD_BUTTON = (By.XPATH, '//button[@type="button" and text()="Добавить"]')  # Кнопка добавить запись
     DOMAIN_ENTRY_TYPE_CNAME = (By.XPATH, '//input[contains(@name, "rdata[name]") and @class="input-element"]')  # Поле ввода поля "Хост назначения"
+    DOMAIN_ENTRY_TYPE_MX_P = (By.XPATH, '//input[contains(@name, "rdata[preference]") and @class="input-element"]')  # Поле ввода поля "Приоритет"
+    DOMAIN_ENTRY_TYPE_MX_HOST_DEST = (By.XPATH, '//input[contains(@name, "rdata[mail_exchanger]") and @class="input-element"]')  # Поле ввода поля "Хост назначения"
 
 
     # DOMAIN_TITLE = (By.XPATH, '')
@@ -69,6 +72,21 @@ class OrderPage(BasicPage):
             EC.invisibility_of_element(
                 OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
         # self.browser.refresh()
+
+    def add_dns_entry_mx(self, sub_domain):
+        """Добавляет DNS запись типа MX"""
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)
+        assert self.wait_for_page_loaded(self.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
+        self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
+        self.click(self.DOMAIN_ENTRY_SELECT)
+        self.click(self.DOMAIN_ENTRY_SELECT_TYPE_MX)
+        self.type(self.DOMAIN_ENTRY_TYPE_A_HOST, sub_domain)
+        self.type(self.DOMAIN_ENTRY_TYPE_MX_P, '10')  # Поле приоритет
+        self.type(self.DOMAIN_ENTRY_TYPE_MX_HOST_DEST, 'mail.host.local')  # Поле приоритет
+        self.click(self.DOMAIN_ENTRY_ADD_BUTTON)
+        WebDriverWait(self.browser, 30).until(
+            EC.invisibility_of_element(
+                OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
 
     def add_dns_entry_a(self):
         """Добавляет DNS запись типа A"""
