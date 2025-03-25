@@ -53,7 +53,7 @@ def test_x(pre_post_dns, browser):
         order_page.add_sub_domain(domain)
         order_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
 
-    step_name = 'Добавление записи DNS типа CNAME'
+    step_name = 'Добавление DNS запись типа CNAME'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_cname(domain)
@@ -63,37 +63,37 @@ def test_x(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа MX'
+    step_name = 'Добавление DNS запись типа MX'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_mx(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа CNAME',
+            name='DNS запись типа MX',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа SRV'
+    step_name = 'Добавление DNS запись типа SRV'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_srv(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name=step_name,
+            name='DNS запись типа SRV',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа TXT'
+    step_name = 'Добавление DNS запись типа TXT'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_txt(domain)
         allure.attach(
             body=order_page.browser.get_screenshot_as_png(),
-            name=step_name,
+            name='DNS запись типа TXT',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = 'Добавление записи DNS типа A'
+    step_name = 'Добавление DNS запись типа A'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.add_dns_entry_a()
