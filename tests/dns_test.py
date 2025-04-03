@@ -8,7 +8,7 @@ from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
-from src.pages.order_page import OrderPage
+from src.pages.DNS_service import DnsPage
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 
@@ -29,7 +29,7 @@ def test_dns(pre_post_dns, browser):
     auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
-    order_page = OrderPage(browser)
+    order_page = DnsPage(browser)
 
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
