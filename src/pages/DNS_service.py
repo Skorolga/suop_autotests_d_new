@@ -8,8 +8,8 @@ from src.pages.basic_page import BasicPage
 from src.pages.orders_page import OrdersPage
 
 
-class OrderPage(BasicPage):
-    """Класс описывает страницу заказа за клиента"""
+class DnsPage(BasicPage):
+    """Класс описывает страницу услуги DNS за клиента"""
 
     def __init__(self, browser):
         super().__init__(browser)
