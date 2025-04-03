@@ -20,8 +20,9 @@ class ClientPage(BasicPage):
     RADIOBUTTON_NEW_ORDER = (By.XPATH, '//div[contains(text(), "Создать новый заказ")]')  # Радиобаттон создать iaas в новом заказе
     COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')
     SUBMIT_BUTTON = (By.XPATH, '//button[@type="submit"]')  # Кнопка заказать
-    NEW_ORDER_NUM = (By.XPATH, "//p[contains(text(), '№')]")  # Локатор модального окна с номером созданного заказа
-    GO_TO_ORDER = (By.XPATH, "//button[contains(text(), 'К заказу')]")  # Кнопка для перехода к заказу из модального окна при создании нового заказа
+    NEW_ORDER_NUM = (By.XPATH, '//p[contains(text(), "№")]')  # Локатор модального окна с номером созданного заказа
+    PARENT_ORDER_NUM = (By.XPATH, '//span[contains(text(), "Заказ №")]')  # Локатор для получения номера родительского заказа
+    GO_TO_ORDER = (By.XPATH, '//button[contains(text(), "К заказу")]')  # Кнопка для перехода к заказу из модального окна при создании нового заказа
     VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # Заголовок в заказе для ожидания загрузки страницы
 
     def __init__(self, browser):
@@ -72,12 +73,14 @@ class ClientPage(BasicPage):
         )
         self.click(self.GO_TO_ORDER)
         self.wait_for_page_loaded(self.VIRT_MACH_TITLE)
+        parent_order_name = self.find_elem(self.PARENT_ORDER_NUM).text
+        parent_order_name = ''.join([symb for symb in parent_order_name if symb.isdigit()])
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
-        return order_num
+        return parent_order_name
 
     def check_cost(self, cost_locator, timeout=10) -> float|bool:
         """Проверяет наличие суммы > 0 по локатору"""
