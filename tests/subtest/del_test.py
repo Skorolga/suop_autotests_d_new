@@ -44,7 +44,7 @@ def test_del(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num = '126773'
+    order_num = '126880'
     # step_name = 'Согласование созданного заказа за менеджера'
     # with allure.step(step_name):
     #     logger.info('Шаг: ' + step_name)
