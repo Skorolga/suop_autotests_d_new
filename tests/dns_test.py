@@ -171,6 +171,7 @@ def test_dns(pre_post_dns, browser):
             name='Удаленный домен отсутствует',
             attachment_type=AttachmentType.PNG
         )
+        time.sleep(5)
 
     step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):

@@ -32,7 +32,7 @@ class ClientPage(BasicPage):
         """Метод создает заказ Публичное облако под уже авторизованным клиентом и возвращает номер заказа"""
         logger.info('Создание заказа Публичное облако за клиента')
         self.click(self.MENU_MAKE_ORDER)
-        self.wait_for_page_loaded(self.BANNER_MAKE_ORDER)
+        # self.wait_for_page_loaded(self.BANNER_MAKE_ORDER)
         self.click(self.BANNER_MAKE_ORDER)
         self.click(self.BUTTON_MAKE_ORDER)
         self.wait_for_page_loaded(self.FORM_TITLE_CONF)

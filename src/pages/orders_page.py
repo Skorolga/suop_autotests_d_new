@@ -10,7 +10,6 @@ from config.config import SUOP
 from src.logger.formatted_logger import logger
 
 
-
 class OrdersPage(BasicPage):
     """Класс описывает страницу с заказами в личном кабинете клиента"""
 
