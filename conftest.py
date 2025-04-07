@@ -1,10 +1,10 @@
 from datetime import datetime
-import time
 from sys import platform
 import subprocess
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+import allure
 
 @pytest.fixture(scope="session")
 def browser():
@@ -29,6 +29,32 @@ def browser():
     yield browser
     browser.quit()
 
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """
+    Хук для получения статуса теста и прикрепления скриншота при падении.
+    """
+    outcome = yield
+    rep = outcome.get_result()
+
+    # Проверяем, что тест упал на этапе выполнения (не setup/teardown)
+    if rep.when == "call" and rep.failed:
+        # Ищем драйвер среди фикстур теста
+        browser = None
+        for fixture_name in item.fixturenames:
+            if "browser" in fixture_name:
+                browser = item.funcargs[fixture_name]
+                break
+
+        if browser and hasattr(browser, "get_screenshot_as_png"):
+            # Создаем скриншот и прикрепляем к Allure
+            screenshot = browser.get_screenshot_as_png()
+            allure.attach(
+                screenshot,
+                name=f"Скриншот ошибки",
+                attachment_type=allure.attachment_type.PNG,
+            )
 
 @pytest.hookimpl()
 def pytest_sessionfinish(session):
