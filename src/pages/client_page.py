@@ -82,7 +82,7 @@ class ClientPage(BasicPage):
         )
         return parent_order_name
 
-    def check_cost(self, cost_locator, timeout=10) -> float|bool:
+    def check_cost(self, cost_locator, timeout=20) -> float|bool:
         """Проверяет наличие суммы > 0 по локатору"""
         start_time = datetime.now()
         while True:
@@ -91,13 +91,12 @@ class ClientPage(BasicPage):
             if time_difference.total_seconds() > timeout:
                 logger.error('timeout при поиске и проверке начисления стоимости заказа без НДС')
                 return False
-
-            order_cost_without_tax = self.find_elem(cost_locator)
-            # logger.info(order_cost_without_tax.text)
-            # logger.info(order_cost_without_tax.text.strip())
-            if order_cost_without_tax.text.strip() == '':  # пропускаем при отсутствии строки, во время загрузки данных
+            try:
+                order_cost_without_tax = self.find_elem(cost_locator).text
+                order_cost_without_tax = float(order_cost_without_tax.strip())
+                logger.info(order_cost_without_tax)
+                if order_cost_without_tax > 0:
+                    return order_cost_without_tax
+            except Exception as e:
                 continue
-            cost = float(order_cost_without_tax.text.strip())
-            if cost > 0:
-                return cost
-            time.sleep(0.5)
+            time.sleep(1)
