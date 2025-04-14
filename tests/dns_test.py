@@ -1,5 +1,6 @@
 import time
 from asyncio import timeout
+from datetime import datetime
 
 import allure
 from allure_commons.types import AttachmentType
@@ -104,7 +105,8 @@ def test_dns(pre_post_dns, browser):
         )
 
     domain = 'autotest'
-    step_name = 'Добавление поддомена'
+    domain = f'{domain}{hash(datetime.now())}'  # Добавляем хеш строку от тек. даты для уникальности
+    step_name = f'Добавление поддомена {domain}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.auth_as_client()
