@@ -54,15 +54,15 @@ class AuthPage(BasicPage):
             self.wait_for_page_loaded(self.LOGIN_FORM)
             self.type(self.LOGIN_FORM, SUOP.CLIENT_LOGIN)
             self.type(self.PASSWORD_FORM, SUOP.CLIENT_PASSWORD)
-        allure.attach(
-            body=self.browser.get_screenshot_as_png(),
-            name='Форма_авторизации',
-            attachment_type=AttachmentType.PNG
-        )
         if first_auth:
             self.click(self.SUBMIT_BTN)
         self.select_role(SUOP.ORGANIZATION_CLIENT)
         time.sleep(3)
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Авторизация за клиента',
+            attachment_type=AttachmentType.PNG
+        )
 
     def relogin_as_admin_suop(self, first_auth=False):
         """Авторизация под ролью Администратора"""

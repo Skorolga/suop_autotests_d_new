@@ -63,12 +63,12 @@ class ClientPage(BasicPage):
             time.sleep(0.5)
         allure.attach(
             body=str(order_num),
-            name="Номер созданного заказа",
+            name="Номер созданного заказа (дочернего)",
             attachment_type=AttachmentType.TEXT,
         )
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Номер созданного заказа',
+            name='Скриншот созданного заказа (дочернего)',
             attachment_type=AttachmentType.PNG
         )
         self.click(self.GO_TO_ORDER)
@@ -79,6 +79,11 @@ class ClientPage(BasicPage):
             body=self.browser.get_screenshot_as_png(),
             name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
+        )
+        allure.attach(
+            body=str(order_num),
+            name="Номер созданного заказа (родительского)",
+            attachment_type=AttachmentType.TEXT,
         )
         return parent_order_name
 

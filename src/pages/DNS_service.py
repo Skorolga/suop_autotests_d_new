@@ -71,8 +71,8 @@ class DnsPage(BasicPage):
         )
 
     def add_dns_entry_cname(self, sub_domain):
-        """Добавляет DNS запись типа CNAME"""
-        self.open_domain_settings(sub_domain)
+        """Добавляет DNS запись типа CNAME (ожидается, что панель настроек домена уже раскрыта)"""
+        # self.open_domain_settings(sub_domain)
         self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)
         assert self.wait_for_page_loaded(self.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
         self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
@@ -152,7 +152,7 @@ class DnsPage(BasicPage):
         self.click(self.DOMAIN_DEL_BUTTON_YES)
         WebDriverWait(self.browser, 30).until(
             EC.invisibility_of_element(DEL_SUB_DOMAIN))  # Ждем когда элемент исчезнет
-        assert self.wait_for_page_loaded(DEL_SUB_DOMAIN, 5) == False  # Ждем удаления домена
+        assert self.find_elem(DEL_SUB_DOMAIN, 3) == False  # Ждем удаления домена
 
     def open_domain_settings(self, sub_domain):
         try:
@@ -161,4 +161,3 @@ class DnsPage(BasicPage):
             self.click(domain_element)
         except Exception as e:
             logger.error(f'Не удалось раскрыть настройки домена {sub_domain}')
-
