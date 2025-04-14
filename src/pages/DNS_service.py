@@ -4,6 +4,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import allure
 from allure_commons.types import AttachmentType
+
+from src.logger.formatted_logger import logger
 from src.pages.basic_page import BasicPage
 from src.pages.orders_page import OrdersPage
 
@@ -16,7 +18,8 @@ class DnsPage(BasicPage):
 
     MENU_INF_NETWORK = (By.XPATH, '//span[contains(text(), "Инфраструктура и")]')
     MENU_INF_NETWORK__DNS = (By.XPATH, '//button[contains(text(), "Управление DNS")]')
-    DOMAIN_ADD_BUTTON = (By.XPATH, '//button[contains(text(), "Заказать")]')  # Кнопка добавления домена (Заказать)
+    DOMAIN_ORDER_BUTTON = (By.XPATH, '//button[contains(text(), "Заказать")]')  # Кнопка добавления домена (Заказать)
+    DOMAIN_ADD_BUTTON = (By.XPATH, '//button[text()="Добавить домен"]')  # Кнопка добавления домена (Заказать)
     DOMAIN_ADD_SELECT = (By.XPATH, '//div[contains(@class, "select__value-container select__value-container--has-value")]')
     DOMAIN_ADD_SELECT_VALUE = (By.XPATH, '//div[contains(@id, "option-1")]')  # Выпадающее меню, выбор поддомена
     DOMAIN_ADD_INPUT = (By.XPATH, '//input[contains(@name, "domain") and @class="input-element"]')  # Кнопка добавления домена (Заказать)
@@ -49,7 +52,11 @@ class DnsPage(BasicPage):
         self.click(self.MENU_INF_NETWORK)
         self.click(self.MENU_INF_NETWORK__DNS)  # Раскрываем в меню настройки ДНС
         # self.wait_for_page_loaded(self.DOMAIN_TITLE)
-        self.click(self.DOMAIN_ADD_BUTTON)
+        try:
+            self.click(self.DOMAIN_ORDER_BUTTON)
+        except Exception as E:
+            logger.info('В ЛК клиента уже имеются добавленные домены')
+            self.click(self.DOMAIN_ADD_BUTTON)
         self.click(self.DOMAIN_ADD_SELECT)
         self.click(self.DOMAIN_ADD_SELECT_VALUE)
         self.type(self.DOMAIN_ADD_INPUT, sub_domain)
@@ -65,7 +72,7 @@ class DnsPage(BasicPage):
 
     def add_dns_entry_cname(self, sub_domain):
         """Добавляет DNS запись типа CNAME"""
-        self.click(self.DOMAIN_ORDER_DROPDOWN)
+        self.open_domain_settings(sub_domain)
         self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)
         assert self.wait_for_page_loaded(self.DOMAIN_ENTRY_TITLE), 'Отсутствует заголовок ДНС записей'
         self.click(self.DOMAIN_ORDER_ADD_AN_ENTRY)  # Добавить запись
@@ -143,4 +150,15 @@ class DnsPage(BasicPage):
         DEL_SUB_DOMAIN = (By.XPATH, f'//td[contains(text(), "{sub_domain}")]/following::td[2]/div')
         self.click(DEL_SUB_DOMAIN)
         self.click(self.DOMAIN_DEL_BUTTON_YES)
-        assert self.wait_for_page_loaded(self.DOMAIN_ADD_BUTTON)  # Ждем удаления домена
+        WebDriverWait(self.browser, 30).until(
+            EC.invisibility_of_element(DEL_SUB_DOMAIN))  # Ждем когда элемент исчезнет
+        assert self.wait_for_page_loaded(DEL_SUB_DOMAIN, 5) == False  # Ждем удаления домена
+
+    def open_domain_settings(self, sub_domain):
+        try:
+            domain_element = (By.XPATH,
+                              f'//table//tbody/tr/td[text()="{sub_domain}.cloud.rt-dc.ru"]/following-sibling::* [3]')
+            self.click(domain_element)
+        except Exception as e:
+            logger.error(f'Не удалось раскрыть настройки домена {sub_domain}')
+
