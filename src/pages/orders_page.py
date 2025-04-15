@@ -89,7 +89,7 @@ class OrdersPage(BasicPage):
         assert self.wait_ready_for_all_child_orders(), f'Не удалось согласовать заказ {num_order}'
 
     def text_check(self, locator, text_trigger, timeout):
-        """Ожидает изменения текста элемента до переданного"""
+        """Ожидает изменения текста элемента до установленного"""
         start_time = datetime.now()
         current_text = self.find_elem(locator).text
         logger.info(f'Состояние заказа: {current_text}')
@@ -105,6 +105,8 @@ class OrdersPage(BasicPage):
             logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
             self.browser.refresh()
             actual_text = self.find_elem(locator).text
+            if type(actual_text) != str:
+                continue
             if actual_text == text_trigger:
                 logger.info(f'Ожидаемое состояние достигнуто: {actual_text}')
                 return True

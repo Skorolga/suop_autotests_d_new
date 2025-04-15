@@ -20,7 +20,7 @@ def pre_post_dns(browser):
     browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
 
 @allure.tag('dns')
-@allure.testcase('https://jira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
+@allure.testcase('https://ejira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
 @allure.story('Управление DNS. Добавление домена.')
 @pytest.mark.dns
 def test_dns(pre_post_dns, browser):
@@ -71,7 +71,7 @@ def test_dns(pre_post_dns, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+        # orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         orders_page.find_order(order_num)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
