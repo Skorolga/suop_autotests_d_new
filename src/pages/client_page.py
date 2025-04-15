@@ -48,7 +48,7 @@ class ClientPage(BasicPage):
         )
         self.click(self.SUBMIT_BUTTON)  # Итоговая кнопка создания заказа
         # ждем создания заказа и получаем его номер
-        self.wait_for_page_loaded(self.NEW_ORDER_NUM)
+        self.wait_for_page_loaded(self.NEW_ORDER_NUM, 180)
         start_time = datetime.now()
         while True:
             time_difference = datetime.now() - start_time
@@ -56,6 +56,8 @@ class ClientPage(BasicPage):
                 logger.error('timeout при создании заказа')
                 return False
             order_num = self.find_elem(self.NEW_ORDER_NUM).text
+            if type(order_num) != str:
+                continue
             order_num = ''.join([symb for symb in order_num if symb.isdigit()])
             if int(order_num) > 0:
                 logger.info(f'Создан заказ № {order_num}')
