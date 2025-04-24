@@ -145,6 +145,56 @@ class DnsPage(BasicPage):
             EC.invisibility_of_element(
                 OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
 
+    def check_all_dns_entries(self, domain):
+        """
+        Проверяет созданные автотестом DNS записи
+        """
+        try:
+            assert self.find_elem((By.XPATH, f'//td[text()="www"]'
+                                             f'[following-sibling::td[1][text()="A"]]'
+                                             f'[following-sibling::*[2]'
+                                             f'//*[text()="1.1.1.1"]]'))
+            logger.info('Созданная автотестом DNS запись типа "A" успешно найдена')
+        except Exception as e:
+            logger.error('Созданная автотестом DNS запись типа "A" не найдена')
+
+        try:
+            assert self.find_elem((By.XPATH, f'//td[text()="www"]'
+                                             f'[following-sibling::td[1]'
+                                             f'[text()="CNAME"]][following-sibling::*[2]'
+                                             f'//*[text()="{domain}.cloud.rt-dc.ru"]]'))
+            logger.info('Созданная автотестом DNS запись типа "CNAME" успешно найдена')
+        except Exception as e:
+            logger.error('Созданная автотестом DNS запись типа "CNAME" не найдена')
+
+        try:
+            assert self.find_elem((By.XPATH, f'//td[text()="{domain}"]'
+                                             f'[following-sibling::td[1][text()="MX"]]'
+                                             f'[following-sibling::*[2]//*[text()="10"]]'
+                                             f'[following-sibling::*[2]//*[text()="mail.host.local"]]'))
+            logger.info('Созданная автотестом DNS запись типа "MX" успешно найдена')
+        except Exception as e:
+            logger.error('Созданная автотестом DNS запись типа "MX" не найдена')
+
+        try:
+            assert self.find_elem((By.XPATH, f'//td[text()="{domain}"]'
+                                             f'[following-sibling::td[1][text()="SRV"]]'
+                                             f'[following-sibling::*[2]//*[text()="8080"]]'
+                                             f'[following-sibling::*[2]//*[text()="50"]]'
+                                             f'[following-sibling::*[2]//*[text()="10"]]'
+                                             f'[following-sibling::*[2]//*[text()="target.host.local"]]'))
+            logger.info('Созданная автотестом DNS запись типа "SRV" успешно найдена')
+        except Exception as e:
+            logger.error('Созданная автотестом DNS запись типа "SRV" не найдена')
+
+        try:
+            assert self.find_elem((By.XPATH, f'//td[text()="{domain}"]'
+                                             f'[following-sibling::td[1][text()="TXT"]]'
+                                             f"[following-sibling::*[2]//*[text()='\"text for TXT entries text for TXT entries text for TXT entries\"']]"))
+            logger.info('Созданная автотестом DNS запись типа "TXT" успешно найдена')
+        except Exception as e:
+            logger.error('Созданная автотестом DNS запись типа "TXT" не найдена')
+
     def del_sub_domain(self, sub_domain):
         """Удаление добавленного поддомена"""
         DEL_SUB_DOMAIN = (By.XPATH, f'//td[contains(text(), "{sub_domain}")]/following::td[2]/div')
