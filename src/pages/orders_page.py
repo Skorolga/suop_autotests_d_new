@@ -129,7 +129,7 @@ class OrdersPage(BasicPage):
         self.browser.refresh()
         self.click(self.ORDER_DELETE, 60 * 3)
         self.click(self.ORDER_DELETE_MODAL_YES, 60 * 3)
-        self.text_check(self.ORDER_STATUS, 'Удален', 60 * 10)
+        assert self.text_check(self.ORDER_STATUS, 'Удален', 60 * 10), 'Заказ не перешел в состояние "Удален"'
 
     def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
         """Находит на странице элементы и ждет когда их статус изменится на Работает"""
