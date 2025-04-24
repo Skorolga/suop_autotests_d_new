@@ -153,6 +153,11 @@ def test_dns(pre_post_dns, browser):
             attachment_type=AttachmentType.PNG
         )
 
+    step_name = 'Проверка созданных DNS записей'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        dns_page.check_all_dns_entries(domain)
+
     step_name = f'Удаление домена {domain}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
