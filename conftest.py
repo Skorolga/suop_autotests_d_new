@@ -5,6 +5,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import allure
+from config.config import SUOP
 
 @pytest.fixture(scope="session")
 def browser():
@@ -28,6 +29,17 @@ def browser():
 
     yield browser
     browser.quit()
+
+@pytest.fixture
+def pre_post_browser(browser):
+    """TODO вынести в отдельную фикстуру, в conftest.py"""
+    yield
+    browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
+
+@allure.tag('dns')
+@allure.testcase('https://ejira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
+@allure.story('Управление DNS. Добавление домена.')
+@pytest.mark.dns
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
