@@ -1,27 +1,18 @@
-import time
-from asyncio import timeout
-from datetime import datetime
-
 import allure
 from allure_commons.types import AttachmentType
-import pytest
+from src.logger.formatted_logger import logger
 from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
-from src.pages.DNS_service import DnsPage
 from config.config import SUOP
-from src.logger.formatted_logger import logger
 
-
-def test_dns(pre_post_browser, browser):
-    """Тест DNS СУ ОП"""
-
+def test_kuber(pre_post_browser, browser):
+    """Тест услуги kubernetes"""
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
-    dns_page = DnsPage(browser)
 
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
@@ -82,83 +73,6 @@ def test_dns(pre_post_browser, browser):
             name='Разрешение на изменение ресурсов',
             attachment_type=AttachmentType.PNG
         )
-
-    domain = 'autotest'
-    domain = f'{domain}{hash(datetime.now())}'  # Добавляем хеш строку от тек. даты для уникальности
-    step_name = f'Добавление поддомена {domain}'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        auth_page.auth_as_client()
-        orders_page.find_order(order_num)
-        dns_page.add_sub_domain(domain)
-        dns_page.browser.refresh()  # TODO без обновления кнопка добавления DNS записи неактивна
-        dns_page.open_domain_settings(domain)
-
-    step_name = 'Добавление DNS записи типа CNAME'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.add_dns_entry_cname(domain)
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа CNAME',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Добавление DNS записи Типа A'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.add_dns_entry_a()
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа А',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Добавление DNS записи типа MX'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.add_dns_entry_mx(domain)
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа MX',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Добавление DNS записи типа SRV'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.add_dns_entry_srv(domain)
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа SRV',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Добавление DNS записи типа TXT'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.add_dns_entry_txt(domain)
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='DNS запись типа TXT',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Проверка созданных DNS записей'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.check_all_dns_entries(domain)
-
-    step_name = f'Удаление домена {domain}'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        dns_page.del_sub_domain(domain)
-        allure.attach(
-            body=dns_page.browser.get_screenshot_as_png(),
-            name='Удаленный домен отсутствует',
-            attachment_type=AttachmentType.PNG
-        )
-        time.sleep(5)
 
     step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):
