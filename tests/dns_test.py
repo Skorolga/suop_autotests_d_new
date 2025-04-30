@@ -1,10 +1,8 @@
 import time
-from asyncio import timeout
 from datetime import datetime
 
 import allure
 from allure_commons.types import AttachmentType
-import pytest
 from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
