@@ -12,6 +12,7 @@ class ClientPage(BasicPage):
 
     MENU_MAKE_ORDER = (By.XPATH, '//span[contains(text(), "Заказать услугу")]')
     BANNER_MAKE_ORDER = (By.XPATH, '//a[@href="/showcase/services/iaas"]')
+    BANNER_MAKE_KUBER_ORDER = (By.XPATH, '//div[@class="service-card-container"]//a[@href="/showcase/services/kaas"]')
     BUTTON_MAKE_ORDER = (By.XPATH, '//button[contains(text(), "Заказать")]')
     TABLE_WITH_ORDERS_IN_LK = (By.XPATH, '//div[contains(@class, "items-table__dropdown")]')  # Проверка загрузки стр. с заказами
 
@@ -24,11 +25,12 @@ class ClientPage(BasicPage):
     PARENT_ORDER_NUM = (By.XPATH, '//span[contains(text(), "Заказ №")]')  # Локатор для получения номера родительского заказа
     GO_TO_ORDER = (By.XPATH, '//button[contains(text(), "К заказу")]')  # Кнопка для перехода к заказу из модального окна при создании нового заказа
     VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # Заголовок в заказе для ожидания загрузки страницы
+    SUBORDER_STATUS_READY = (By.XPATH, '//div[contains(@class,"icon-hint")]//p[contains(text(), "Работает")]')  # Статус дочернего заказа в ЛК клиента
 
     def __init__(self, browser):
         super().__init__(browser)
 
-    def make_order(self, timeout=360) -> str:
+    def make_order(self, timeout=360) -> str | bool:
         """Метод создает заказ Публичное облако под уже авторизованным клиентом и возвращает номер заказа"""
         logger.info('Создание заказа Публичное облако за клиента')
         self.click(self.MENU_MAKE_ORDER)
@@ -89,7 +91,7 @@ class ClientPage(BasicPage):
         )
         return parent_order_name
 
-    def check_cost(self, cost_locator, timeout=20) -> float|bool:
+    def check_cost(self, cost_locator, timeout=30) -> float|bool:
         """Проверяет наличие суммы > 0 по локатору"""
         start_time = datetime.now()
         while True:
@@ -100,10 +102,12 @@ class ClientPage(BasicPage):
                 return False
             try:
                 order_cost_without_tax = self.find_elem(cost_locator).text
+                order_cost_without_tax = ''.join([i for i in order_cost_without_tax if i.isdigit() or i == '.'])  # Убираем лишние знаки для конвертации str -> float
                 order_cost_without_tax = float(order_cost_without_tax.strip())
-                logger.info(order_cost_without_tax)
+                # logger.info(order_cost_without_tax)
                 if order_cost_without_tax > 0:
                     return order_cost_without_tax
             except Exception as e:
+                # logger.warning(f'Ошибка в методе check_cost: {e}')
                 continue
             time.sleep(1)
