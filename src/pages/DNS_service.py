@@ -11,7 +11,7 @@ from src.pages.orders_page import OrdersPage
 
 
 class DnsPage(BasicPage):
-    """Класс описывает страницу услуги DNS за клиента"""
+    """Класс описывает услугу DNS за клиента"""
 
     def __init__(self, browser):
         super().__init__(browser)
