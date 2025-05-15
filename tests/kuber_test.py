@@ -5,6 +5,7 @@ from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
+from src.pages.kuber_service import KuberService
 from config.config import SUOP
 
 def test_kuber(pre_post_browser, browser):
@@ -13,6 +14,7 @@ def test_kuber(pre_post_browser, browser):
     auth_page = AuthPage(browser)
     client_page = ClientPage(browser)
     orders_page = OrdersPage(browser)
+    kuber_service = KuberService(browser)
 
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
@@ -73,6 +75,18 @@ def test_kuber(pre_post_browser, browser):
             name='Разрешение на изменение ресурсов',
             attachment_type=AttachmentType.PNG
         )
+
+    step_name = f'Заказ услуги kubernetes из витрины'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.auth_as_client()
+        kuber_service.make_k8s_order()
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Страница создания заказа',
+            attachment_type=AttachmentType.PNG
+        )
+
 
     step_name = f'Удаление заказа {order_num}'
     with allure.step(step_name):

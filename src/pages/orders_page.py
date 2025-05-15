@@ -3,6 +3,7 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from src.pages.basic_page import BasicPage
 from src.pages.client_page import ClientPage
 from src.pages.auth_page import AuthPage
@@ -88,9 +89,19 @@ class OrdersPage(BasicPage):
         logger.info('Ожидание состояние "Работает" у дочерних заказов')
         assert self.wait_ready_for_all_child_orders(), f'Не удалось согласовать заказ {num_order}'
 
-    def text_check(self, locator, text_trigger, timeout):
-        """Ожидает изменения текста элемента до установленного"""
+    def text_check(self, locator, text_trigger, timeout, hover_element=None) -> bool:
+        """
+        Ожидает изменения текста элемента до установленного
+        :param locator: локатор в котором проверяется текст
+        :param text_trigger: ожидаемый текст
+        :param timeout: таймаут для цикла проверки
+        :param hover_element: навести курсор на элемент перед считыванием текста
+        :return: bool
+        """
         start_time = datetime.now()
+        if hover_element:
+            status_element = self.find_elem(hover_element)
+            ActionChains(self.browser).move_to_element(status_element).perform()
         current_text = self.find_elem(locator).text
         logger.info(f'Состояние заказа: {current_text}')
         i = 0
@@ -100,19 +111,25 @@ class OrdersPage(BasicPage):
             if time_difference.total_seconds() > timeout:
                 logger.error('timeout при ожидании изменения статуса')
                 return False
+            if hover_element:
+                status_element = self.find_elem(hover_element)
+                ActionChains(self.browser).move_to_element(status_element).perform()
 
             i += 1
             logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
             self.browser.refresh()
-            actual_text = self.find_elem(locator).text
-            if type(actual_text) != str:
+            elem_for_actual_text = self.find_elem(locator)
+            if elem_for_actual_text:
+                elem_for_actual_text = elem_for_actual_text.text
+            if type(elem_for_actual_text) != str:
+                time.sleep(10)
                 continue
-            if actual_text == text_trigger:
-                logger.info(f'Ожидаемое состояние достигнуто: {actual_text}')
+            if elem_for_actual_text == text_trigger:
+                logger.info(f'Ожидаемое состояние достигнуто: {elem_for_actual_text}')
                 return True
-            elif current_text != actual_text:
-                logger.info(f'Состояние изменилось: {actual_text}')
-                current_text = actual_text
+            elif current_text != elem_for_actual_text:
+                logger.info(f'Состояние изменилось: {elem_for_actual_text}')
+                current_text = elem_for_actual_text
             else:  # Если найдено триггерное слово завершаем проверку
                 logger.info(f'Состояние не изменилось')
             time.sleep(10)
