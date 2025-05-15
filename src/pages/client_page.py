@@ -25,7 +25,7 @@ class ClientPage(BasicPage):
     PARENT_ORDER_NUM = (By.XPATH, '//span[contains(text(), "Заказ №")]')  # Локатор для получения номера родительского заказа
     GO_TO_ORDER = (By.XPATH, '//button[contains(text(), "К заказу")]')  # Кнопка для перехода к заказу из модального окна при создании нового заказа
     VIRT_MACH_TITLE = (By.XPATH, '//div[contains(text(), "Виртуальные машины")]')  # Заголовок в заказе для ожидания загрузки страницы
-    SUBORDER_STATUS_READY = (By.XPATH, '//div[contains(@class,"icon-hint")]//p[contains(text(), "Работает")]')  # Статус дочернего заказа в ЛК клиента
+    # SUBORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')  # Статус дочернего заказа в ЛК клиента
 
     def __init__(self, browser):
         super().__init__(browser)
