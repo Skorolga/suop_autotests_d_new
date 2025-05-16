@@ -111,13 +111,13 @@ class OrdersPage(BasicPage):
             if time_difference.total_seconds() > timeout:
                 logger.error('timeout при ожидании изменения статуса')
                 return False
-            if hover_element:
-                status_element = self.find_elem(hover_element)
-                ActionChains(self.browser).move_to_element(status_element).perform()
 
             i += 1
             logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
             self.browser.refresh()
+            if hover_element:
+                status_element = self.find_elem(hover_element)
+                ActionChains(self.browser).move_to_element(status_element).perform()
             elem_for_actual_text = self.find_elem(locator)
             if elem_for_actual_text:
                 elem_for_actual_text = elem_for_actual_text.text

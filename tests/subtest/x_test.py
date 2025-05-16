@@ -1,3 +1,5 @@
+import time
+
 import allure
 from allure_commons.types import AttachmentType
 from src.pages.main_page import MainPage
@@ -59,5 +61,22 @@ def test_x(pre_post_browser, browser):
         order_page.click(MENU_CONTAINERS)
         order_page.click(MENU_CONTAINERS_K8S)
         order_page.text_check(kuber_service.ORDER_STATUS_TEXT, 'Работает', 60 * 15, kuber_service.ORDER_STATUS)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Созданный заказ Kubernetes',
+            attachment_type=AttachmentType.PNG
+        )
 
+    step_name = f'Проверка вкладки Информация'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.click(kuber_service.K8S_ORDER_DROPDOWN)
+        time.sleep(1)
+        elem_for_scroll = kuber_service.find_elem(kuber_service.K8S_ORDER_INFO_DATE)
+        kuber_service.scroll_to_element(elem_for_scroll)
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name=step_name,
+            attachment_type=AttachmentType.PNG
+        )
 
