@@ -114,7 +114,7 @@ class OrdersPage(BasicPage):
 
             i += 1
             logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
-            self.browser.refresh()
+            # self.browser.refresh()
             if hover_element:
                 status_element = self.find_elem(hover_element)
                 ActionChains(self.browser).move_to_element(status_element).perform()
@@ -132,6 +132,7 @@ class OrdersPage(BasicPage):
                 current_text = elem_for_actual_text
             else:  # Если найдено триггерное слово завершаем проверку
                 logger.info(f'Состояние не изменилось')
+            self.browser.refresh()
             time.sleep(10)
 
     def del_order(self, num_order):
