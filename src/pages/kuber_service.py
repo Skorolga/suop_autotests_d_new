@@ -70,7 +70,7 @@ class KuberService(BasicPage):
     def check_info_tab(self):
         """Проверка вкладки Информация в заказе Kubernetes"""
         self.click(self.K8S_ORDER_DROPDOWN)
-        # elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
-        # self.scroll_to_element(elem_for_scroll)
+        elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
+        self.scroll_to_element(elem_for_scroll)
         assert self.wait_for_page_loaded(self.K8S_ORDER_INFO_TITLE), 'Отсутствует заголовок вкладки Информация'
 
