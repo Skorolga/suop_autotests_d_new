@@ -26,7 +26,7 @@ class DnsPage(BasicPage):
     DOMAIN_DEL_BUTTON_YES = (By.XPATH, '//button[text()="Да"]')  # Кнопка удаления домена
     DOMAIN_TITLE = (By.XPATH, '//div[@class="section-title section-title--left"]')
 
-    DOMAIN_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[4]')
+    # DOMAIN_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[4]')
     DOMAIN_ORDER_ADD_AN_ENTRY = (By.XPATH, '//div[contains(@class, "dns-records-bar__actions-wrapper")]//*[3]')  # Кнопка добавить ДНС запись
     DOMAIN_ENTRY_TITLE = (By.XPATH, '//div[contains(text(), "DNS записи")]')  # Для проверки загрузки настройки домена
     DOMAIN_ENTRY_SELECT = (By.XPATH, '//div[contains(@class, "select__value-container")]')  # Выпадающее меню "Тип записи"
