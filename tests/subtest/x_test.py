@@ -70,10 +70,7 @@ def test_x(pre_post_browser, browser):
     step_name = f'Проверка вкладки Информация'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.click(kuber_service.K8S_ORDER_DROPDOWN)
-        time.sleep(1)
-        elem_for_scroll = kuber_service.find_elem(kuber_service.K8S_ORDER_INFO_DATE)
-        kuber_service.scroll_to_element(elem_for_scroll)
+        kuber_service.check_info_tab()
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name=step_name,
