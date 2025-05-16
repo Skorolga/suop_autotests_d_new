@@ -21,6 +21,9 @@ class KuberService(BasicPage):
     KUBER_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
     ORDER_STATUS_TEXT = (By.XPATH, '//div[@class="suborder-state-status"]//p[@class="icon-hint__text"]')
+    K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
+    K8S_ORDER_INFO_TITLE = (By.XPATH, '//div[@class="heading-title"][contains(text(), "Параметры кластера Kubernetes")]')
+    K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -64,14 +67,10 @@ class KuberService(BasicPage):
         self.click(ClientPage.GO_TO_ORDER)
         self.order_page.text_check(self.ORDER_STATUS_TEXT, 'Работает', 60*15, self.ORDER_STATUS)
 
-    # @staticmethod
-    # def is_ready(timeout=60*20) -> bool:
-    #     """Ждет перехода в состояние Работает"""
-    #     start_time = datetime.now()
-    #     while True:
-    #         # Установка таймаута
-    #         time_difference = datetime.now() - start_time
-    #         if time_difference.total_seconds() > timeout:
-    #             logger.error('timeout при ожидании изменения статуса')
-    #             return False
+    def check_info_tab(self):
+        """Проверка вкладки Информация в заказе Kubernetes"""
+        self.click(self.K8S_ORDER_DROPDOWN)
+        # elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
+        # self.scroll_to_element(elem_for_scroll)
+        assert self.wait_for_page_loaded(self.K8S_ORDER_INFO_TITLE), 'Отсутствует заголовок вкладки Информация'
 
