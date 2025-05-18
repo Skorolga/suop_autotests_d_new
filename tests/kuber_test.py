@@ -87,13 +87,20 @@ def test_kuber(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-
-    step_name = f'Удаление заказа {order_num}'
+    step_name = f'Вкладка раздела Информация'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        auth_page.relogin_as_admin_suop()
-        orders_page.del_order(order_num)
+        kuber_service.check_info_tab()
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Удаленный заказ',
+            attachment_type=AttachmentType.PNG
+        )
 
+    step_name = f'Удаление заказа'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.del_k8s_order()
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Удаленный заказ',

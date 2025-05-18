@@ -8,6 +8,8 @@ from src.pages.basic_page import BasicPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 class KuberService(BasicPage):
@@ -24,6 +26,7 @@ class KuberService(BasicPage):
     K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
     K8S_ORDER_INFO_TITLE = (By.XPATH, '//div[@class="heading-title"][contains(text(), "Параметры кластера Kubernetes")]')
     K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
+    K8S_ORDER_DEL = (By.XPATH, '//*[@id="close"]/parent::*')  # Кнопка удаления заказа
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -65,7 +68,10 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         self.click(ClientPage.GO_TO_ORDER)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT, 'Работает', 60*15, self.ORDER_STATUS)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Работает',
+                                   refresh_timeout=60*3,
+                                   hover_element=self.ORDER_STATUS)
 
     def check_info_tab(self):
         """Проверка вкладки Информация в заказе Kubernetes"""
@@ -73,4 +79,24 @@ class KuberService(BasicPage):
         elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
         self.scroll_to_element(elem_for_scroll)
         assert self.wait_for_page_loaded(self.K8S_ORDER_INFO_TITLE), 'Отсутствует заголовок вкладки Информация'
+
+    def del_k8s_order(self):
+        """Удаление дочернего заказа Kubernetes"""
+        elem_for_del = (By.XPATH, '//td/div/*[contains(text(), "Кластер Kubernetes")]/following::td[3]//*[@id="close"]')
+        self.click(elem_for_del)
+        self.click(OrdersPage.ORDER_POWER_OFF_MODAL_YES)
+        self.find_elem(self.ORDER_STATUS_TEXT)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Удаление хранилища',
+                                   refresh_timeout=60*3,
+                                   hover_element=self.ORDER_STATUS)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Удаление кластера',
+                                   refresh_timeout=60*3,
+                                   hover_element=self.ORDER_STATUS)
+        WebDriverWait(self.browser, 60*30).until(
+            EC.invisibility_of_element_located((By.XPATH, '//td/div/*[contains(text(), "Кластер Kubernetes")]'))
+        )  # Ждем когда элемент исчезнет
+        assert self.find_elem(elem_for_del, 10) == False  # Ждем удаления
+
 
