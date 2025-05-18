@@ -84,25 +84,31 @@ class OrdersPage(BasicPage):
         logger.info('Согласование заказа')
         self.click(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click(self.ORDER_BUTTON_APPROVE_MANAGER_2)
-        self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов', 60 * 10)
-        self.text_check(self.ORDER_STATUS, 'Работает', 60 * 10)
+        self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов')
+        self.text_check(self.ORDER_STATUS, 'Работает')
         logger.info('Ожидание состояние "Работает" у дочерних заказов')
         assert self.wait_ready_for_all_child_orders(), f'Не удалось согласовать заказ {num_order}'
 
-    def text_check(self, locator, text_trigger, timeout, hover_element=None) -> bool:
+    def text_check(self, locator, text_trigger, timeout=60*30, refresh_timeout=60*5, hover_element=None) -> bool:
         """
         Ожидает изменения текста элемента до установленного
         :param locator: локатор в котором проверяется текст
         :param text_trigger: ожидаемый текст
         :param timeout: таймаут для цикла проверки
+        :param refresh_timeout: таймаут для обновления
         :param hover_element: навести курсор на элемент перед считыванием текста
         :return: bool
         """
         start_time = datetime.now()
+        start_time_refresh = datetime.now()
+
         if hover_element:
             status_element = self.find_elem(hover_element)
             ActionChains(self.browser).move_to_element(status_element).perform()
-        current_text = self.find_elem(locator).text
+
+        current_text = self.find_elem(locator)
+        if current_text:
+            current_text = current_text.text
         logger.info(f'Состояние заказа: {current_text}')
         i = 0
         while True:
@@ -111,9 +117,9 @@ class OrdersPage(BasicPage):
             if time_difference.total_seconds() > timeout:
                 logger.error('timeout при ожидании изменения статуса')
                 return False
-
-            i += 1
-            logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
+            #
+            # i += 1
+            # logger.info(f'Итерация №: {i} Прошло: {time_difference} сек')
             # self.browser.refresh()
             if hover_element:
                 status_element = self.find_elem(hover_element)
@@ -122,18 +128,23 @@ class OrdersPage(BasicPage):
             if elem_for_actual_text:
                 elem_for_actual_text = elem_for_actual_text.text
             if type(elem_for_actual_text) != str:
-                time.sleep(10)
+                time.sleep(2)
                 continue
             if elem_for_actual_text == text_trigger:
-                logger.info(f'Ожидаемое состояние достигнуто: {elem_for_actual_text}')
+                logger.info(f'Ожидаемое состояние достигнуто: {text_trigger} за {time_difference} сек')
                 return True
-            elif current_text != elem_for_actual_text:
-                logger.info(f'Состояние изменилось: {elem_for_actual_text}')
+            elif elem_for_actual_text != current_text:
+                logger.info(f'Состояние изменилось: {elem_for_actual_text} за {time_difference} сек')
                 current_text = elem_for_actual_text
-            else:  # Если найдено триггерное слово завершаем проверку
-                logger.info(f'Состояние не изменилось')
-            self.browser.refresh()
-            time.sleep(10)
+            # else:
+            #     logger.info(f'Состояние не изменилось')
+            time_difference = datetime.now() - start_time_refresh
+            if int(time_difference.total_seconds()) > refresh_timeout:
+                self.browser.refresh()
+                time.sleep(5)
+                self.browser.refresh()  # Баг с правами, нужно доп. перезагрузка
+                start_time_refresh = datetime.now()
+            time.sleep(2)
 
     def del_order(self, num_order):
         """Удаляет заказ по номеру"""
@@ -143,11 +154,11 @@ class OrdersPage(BasicPage):
         self.find_order(num_order)
         self.click(self.ORDER_POWER_OFF)
         self.click(self.ORDER_POWER_OFF_MODAL_YES)
-        self.text_check(self.ORDER_STATUS, 'Выключен', 60*10)
+        self.text_check(self.ORDER_STATUS, 'Выключен')
         self.browser.refresh()
         self.click(self.ORDER_DELETE, 60 * 3)
         self.click(self.ORDER_DELETE_MODAL_YES, 60 * 3)
-        assert self.text_check(self.ORDER_STATUS, 'Удален', 60 * 10), 'Заказ не перешел в состояние "Удален"'
+        assert self.text_check(self.ORDER_STATUS, 'Удален'), 'Заказ не перешел в состояние "Удален"'
 
     def wait_ready_for_all_child_orders(self, locator=READY_STATUS_ALL_SUBORDERS, timeout=600) -> bool:
         """Находит на странице элементы и ждет когда их статус изменится на Работает"""
