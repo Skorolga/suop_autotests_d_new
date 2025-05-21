@@ -82,8 +82,8 @@ def test_kuber(pre_post_browser, browser):
         auth_page.auth_as_client()
         kuber_service.make_k8s_order()
         allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Страница создания заказа',
+            body=kuber_service.browser.get_screenshot_as_png(),
+            name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
 
@@ -93,7 +93,7 @@ def test_kuber(pre_post_browser, browser):
         kuber_service.check_info_tab()
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
-            name='Удаленный заказ',
+            name='Вкладка раздела Информация',
             attachment_type=AttachmentType.PNG
         )
 
@@ -101,6 +101,18 @@ def test_kuber(pre_post_browser, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         kuber_service.del_k8s_order()
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Удаленный заказ',
+            attachment_type=AttachmentType.PNG
+        )
+
+    step_name = f'Удаление заказа {order_num}'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.relogin_as_admin_suop()
+        orders_page.del_order(order_num)
+
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Удаленный заказ',
