@@ -64,7 +64,7 @@ class KuberService(BasicPage):
         )
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Скриншот созданного заказа (дочернего)',
+            name='Модальное окно созданного заказа (дочернего)',
             attachment_type=AttachmentType.PNG
         )
         self.click(ClientPage.GO_TO_ORDER)
@@ -98,5 +98,3 @@ class KuberService(BasicPage):
             EC.invisibility_of_element_located((By.XPATH, '//td/div/*[contains(text(), "Кластер Kubernetes")]'))
         )  # Ждем когда элемент исчезнет
         assert self.find_elem(elem_for_del, 10) == False  # Ждем удаления
-
-

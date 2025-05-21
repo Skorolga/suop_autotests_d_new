@@ -48,7 +48,7 @@ def test_x(pre_post_browser, browser):
         kuber_service.make_k8s_order()
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
-            name='Страница создания заказа',
+            name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
 
