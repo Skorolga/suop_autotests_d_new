@@ -6,12 +6,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver import ActionChains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import TimeoutException, NoSuchElementException
+from selenium.webdriver.common.keys import Keys
 from src.logger.formatted_logger import logger
 
 
 class BasicPage(object):
     """Основной класс для страниц"""
-    timeout = 30
+    timeout = 60
 
     def __init__(self, browser):
         self.browser = browser
@@ -103,3 +104,17 @@ class BasicPage(object):
         elem = self.find_elem(locator)
         if elem:
             return elem.text
+
+    def custom_clear(self, locator):
+        """Кастомный метод очистки текстового поля"""
+        try:
+            elem = self.find_elem(locator)
+            if elem:
+                elem.click()
+                elem.send_keys(Keys.BACKSPACE*10)
+                time.sleep(0.5)  # После удаления фронт дописывает 0, жмем Backspace ещё раз
+                elem.send_keys(Keys.BACKSPACE)
+        except Exception as e:
+            logger.warning('Не удалось очистить текстовое поле кастомным методом класса base_page')
+
+

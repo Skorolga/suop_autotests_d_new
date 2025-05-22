@@ -41,54 +41,60 @@ def test_x(pre_post_browser, browser):
         )
     order_num = '132971'
 
-    step_name = f'Заказ услуги kubernetes из витрины'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        auth_page.auth_as_client()
-        kuber_service.make_k8s_order()
-        allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Страница созданного заказа',
-            attachment_type=AttachmentType.PNG
-        )
-
     # step_name = f'Заказ услуги kubernetes из витрины'
-    # # с созданным заказом
     # with allure.step(step_name):
     #     logger.info('Шаг: ' + step_name)
-    #     order_page.find_order(order_num)
-    #     MENU_CONTAINERS = (By.XPATH, '//span[contains(text(), "Контейнеры")]')
-    #     MENU_CONTAINERS_K8S = (By.XPATH, '//button[contains(text(), "Kubernetes как сервис")]')
-    #     order_page.click(MENU_CONTAINERS)
-    #     order_page.click(MENU_CONTAINERS_K8S)
-    #     order_page.text_check(kuber_service.ORDER_STATUS_TEXT,
-    #                           'Работает',
-    #                           refresh_timeout=60,
-    #                           hover_element=kuber_service.ORDER_STATUS)
+    #     auth_page.auth_as_client()
+    #     kuber_service.make_k8s_order()
     #     allure.attach(
     #         body=auth_page.browser.get_screenshot_as_png(),
-    #         name='Созданный заказ Kubernetes',
+    #         name='Страница созданного заказа',
     #         attachment_type=AttachmentType.PNG
     #     )
+
+    step_name = f'Заказ услуги kubernetes из витрины'
+    # с созданным заказом
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        order_page.find_order(order_num)
+        MENU_CONTAINERS = (By.XPATH, '//span[contains(text(), "Контейнеры")]')
+        MENU_CONTAINERS_K8S = (By.XPATH, '//button[contains(text(), "Kubernetes как сервис")]')
+        order_page.click(MENU_CONTAINERS)
+        order_page.click(MENU_CONTAINERS_K8S)
+        order_page.text_check(kuber_service.ORDER_STATUS_TEXT,
+                              'Работает',
+                              refresh_timeout=60,
+                              hover_element=kuber_service.ORDER_STATUS)
+        allure.attach(
+            body=kuber_service.browser.get_screenshot_as_png(),
+            name='Созданный заказ Kubernetes',
+            attachment_type=AttachmentType.PNG
+        )
 
     step_name = f'Проверка вкладки Информация'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         kuber_service.check_info_tab()
         allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
+            body=kuber_service.browser.get_screenshot_as_png(),
             name=step_name,
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Удаление заказа'
+    step_name = f'Проверка вкладки Узлы'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.del_k8s_order()
-        allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Удаленный заказ',
-            attachment_type=AttachmentType.PNG
-        )
+        kuber_service.check_nodes_tab()
+
+
+    # step_name = f'Удаление заказа'
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     kuber_service.del_k8s_order()
+    #     allure.attach(
+    #         body=auth_page.browser.get_screenshot_as_png(),
+    #         name='Удаленный заказ',
+    #         attachment_type=AttachmentType.PNG
+    #     )
 
 

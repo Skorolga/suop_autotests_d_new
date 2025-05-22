@@ -1,5 +1,7 @@
 import time
 from datetime import datetime
+from time import sleep
+
 import allure
 from allure_commons.types import AttachmentType
 
@@ -27,6 +29,17 @@ class KuberService(BasicPage):
     K8S_ORDER_INFO_TITLE = (By.XPATH, '//div[@class="heading-title"][contains(text(), "Параметры кластера Kubernetes")]')
     K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
     K8S_ORDER_DEL = (By.XPATH, '//*[@id="close"]/parent::*')  # Кнопка удаления заказа
+    K8S_ORDER_NODES = (By.XPATH, '//button[contains(text(), "Узлы")]')  # Раздел Узлы в заказе k8s
+    K8S_ORDER_NODES_MASTER_DATA = (By.XPATH, '//button[contains(text(), "Узлы")]')  # Строка Мастер-узлы в таблице
+    K8S_ORDER_NODES_ADD_NODES = (By.XPATH, '//div/span[contains(text(), "Добавить группу узлов")]')  # Строка Мастер-узлы в таблице
+    K8S_ORDER_NODES_ADD_NODES_NAME = (By.XPATH, '//input[contains(@id, "name")]')  # Название узла
+    K8S_ORDER_NODES_ADD_NODES_COUNTS = (By.XPATH, '//input[contains(@name, "workers_count")]')  # Количество узлов
+    K8S_ORDER_NODES_ADD_NODES_VCPU = (By.XPATH, '//input[contains(@name, "vcpu")]')  # Количество CPU
+    K8S_ORDER_NODES_ADD_NODES_RAM = (By.XPATH, '//input[contains(@name, "vram")]')  # Количество RAM
+    K8S_ORDER_NODES_ADD_NODES_DISK_SIZE = (By.XPATH, '//input[contains(@name, "datastore_size")]')  # Объем диска
+    K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON = (By.XPATH, '//button[text()="Добавить"]')  # Кнопка добавления узла
+
+
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -75,10 +88,53 @@ class KuberService(BasicPage):
 
     def check_info_tab(self):
         """Проверка вкладки Информация в заказе Kubernetes"""
-        self.click(self.K8S_ORDER_DROPDOWN)
+        self.click(self.K8S_ORDER_DROPDOWN)  # TODO вынести в отдельную фн.
         elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
         self.scroll_to_element(elem_for_scroll)
         assert self.wait_for_page_loaded(self.K8S_ORDER_INFO_TITLE), 'Отсутствует заголовок вкладки Информация'
+
+    def check_nodes_tab(self):
+        """Проверка вкладки Узлы в заказе Kubernetes"""
+        self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
+        self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Раздел Узлы',
+            attachment_type=AttachmentType.PNG
+        )
+        self.click(self.K8S_ORDER_NODES_ADD_NODES)
+        # time.sleep(5)
+        node_name = f'autotest{abs(hash(datetime.now()))}'  # Наименование группы узлов
+        self.type(self.K8S_ORDER_NODES_ADD_NODES_NAME, node_name)
+        self.custom_clear(self.K8S_ORDER_NODES_ADD_NODES_COUNTS)
+        self.type(self.K8S_ORDER_NODES_ADD_NODES_COUNTS, '4')
+        self.custom_clear(self.K8S_ORDER_NODES_ADD_NODES_VCPU)
+        self.type(self.K8S_ORDER_NODES_ADD_NODES_VCPU, '8')
+        self.custom_clear(self.K8S_ORDER_NODES_ADD_NODES_RAM)
+        self.type(self.K8S_ORDER_NODES_ADD_NODES_RAM, '8')
+        self.custom_clear(self.K8S_ORDER_NODES_ADD_NODES_DISK_SIZE)
+        self.type(self.K8S_ORDER_NODES_ADD_NODES_DISK_SIZE, '50')
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Форма добавления Группы Узлов',
+            attachment_type=AttachmentType.PNG
+        )
+        self.click(self.K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Изменение ресурсов',
+                                   refresh_timeout=60 * 3,
+                                   hover_element=self.ORDER_STATUS)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Работает',
+                                   refresh_timeout=60 * 3,
+                                   hover_element=self.ORDER_STATUS)
+        self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Созданная группа узлов',
+            attachment_type=AttachmentType.PNG
+        )
+
 
     def del_k8s_order(self):
         """Удаление дочернего заказа Kubernetes"""
