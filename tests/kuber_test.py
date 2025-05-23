@@ -93,11 +93,16 @@ def test_kuber(pre_post_browser, browser):
         kuber_service.check_info_tab()
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
-            name='Вкладка раздела Информация',
+            name= 'Раздел Информация',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Удаление заказа'
+    step_name = f'Проверка вкладки Узлы'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.check_nodes_tab()
+
+    step_name = f'Удаление заказа Kubernetes'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         kuber_service.del_k8s_order()
@@ -107,7 +112,7 @@ def test_kuber(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Удаление заказа {order_num}'
+    step_name = f'Удаление родительского заказа {order_num}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_admin_suop()
@@ -115,6 +120,6 @@ def test_kuber(pre_post_browser, browser):
 
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
-            name='Удаленный заказ',
+            name='Удаленный родительский заказ',
             attachment_type=AttachmentType.PNG
         )

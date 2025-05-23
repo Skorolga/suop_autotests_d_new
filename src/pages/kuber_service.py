@@ -1,4 +1,5 @@
 import time
+from asyncio import timeout
 from datetime import datetime
 from time import sleep
 
@@ -30,7 +31,7 @@ class KuberService(BasicPage):
     K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
     K8S_ORDER_DEL = (By.XPATH, '//*[@id="close"]/parent::*')  # Кнопка удаления заказа
     K8S_ORDER_NODES = (By.XPATH, '//button[contains(text(), "Узлы")]')  # Раздел Узлы в заказе k8s
-    K8S_ORDER_NODES_MASTER_DATA = (By.XPATH, '//button[contains(text(), "Узлы")]')  # Строка Мастер-узлы в таблице
+    K8S_ORDER_NODES_MASTER_DATA = (By.XPATH, '//p[contains(text(), "Мастер-узлы")]')  # Строка Мастер-узлы в таблице
     K8S_ORDER_NODES_ADD_NODES = (By.XPATH, '//div/span[contains(text(), "Добавить группу узлов")]')  # Строка Мастер-узлы в таблице
     K8S_ORDER_NODES_ADD_NODES_NAME = (By.XPATH, '//input[contains(@id, "name")]')  # Название узла
     K8S_ORDER_NODES_ADD_NODES_COUNTS = (By.XPATH, '//input[contains(@name, "workers_count")]')  # Количество узлов
@@ -38,6 +39,7 @@ class KuberService(BasicPage):
     K8S_ORDER_NODES_ADD_NODES_RAM = (By.XPATH, '//input[contains(@name, "vram")]')  # Количество RAM
     K8S_ORDER_NODES_ADD_NODES_DISK_SIZE = (By.XPATH, '//input[contains(@name, "datastore_size")]')  # Объем диска
     K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON = (By.XPATH, '//button[text()="Добавить"]')  # Кнопка добавления узла
+    K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON = (By.XPATH, '//button[text()="Да"]')  # Кнопка добавления узла
 
 
 
@@ -67,7 +69,7 @@ class KuberService(BasicPage):
                 continue
             order_num = ''.join([symb for symb in order_num if symb.isdigit()])
             if int(order_num) > 0:
-                logger.info(f'Создан заказ № {order_num}')
+                logger.info(f'Создан заказ Kubernetes № {order_num}')
                 break
             time.sleep(0.5)
         allure.attach(
@@ -129,11 +131,34 @@ class KuberService(BasicPage):
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
+        assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Созданная группа узлов',
             attachment_type=AttachmentType.PNG
         )
+        # Удаление созданного узла
+        logger.info(f'Удаление созданного узла Kubernetes {node_name}')
+        del_locator = (By.XPATH, f'//td[./div/p[contains(text(), "{node_name}")]]'
+                              '//following-sibling::td[6]')
+        self.click(del_locator)
+        self.click(self.K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Изменение ресурсов',
+                                   refresh_timeout=60 * 3,
+                                   hover_element=self.ORDER_STATUS)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Работает',
+                                   refresh_timeout=60 * 3,
+                                   hover_element=self.ORDER_STATUS)
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Удаленная группа узлов',
+            attachment_type=AttachmentType.PNG
+        )
+        assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
+            'Не удалось подтвердить удаление узла Kubernetes'
+
 
 
     def del_k8s_order(self):
@@ -143,7 +168,7 @@ class KuberService(BasicPage):
         self.click(OrdersPage.ORDER_POWER_OFF_MODAL_YES)
         self.find_elem(self.ORDER_STATUS_TEXT)
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
-                                   'Удаление хранилища',
+                                   'Удаление сетевой связности',
                                    refresh_timeout=60*3,
                                    hover_element=self.ORDER_STATUS)
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
