@@ -121,15 +121,26 @@ class KuberService(BasicPage):
             name='Форма добавления Группы Узлов',
             attachment_type=AttachmentType.PNG
         )
+        # Добавление новых узлов
         self.click(self.K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON)
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
+        try:
+            self.click(self.K8S_ORDER_DROPDOWN)
+            self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
+        except Exception as e:
+            logger.info('Раскрыть заказ Kubernetes не потребовалось')
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
+        try:
+            self.click(self.K8S_ORDER_DROPDOWN)
+            self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
+        except Exception as e:
+            logger.info('Раскрыть заказ Kubernetes не потребовалось')
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
         assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
         allure.attach(
@@ -156,6 +167,7 @@ class KuberService(BasicPage):
             name='Удаленная группа узлов',
             attachment_type=AttachmentType.PNG
         )
+        time.sleep(3)  # ждем завершения анимации удаления узлов
         assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
             'Не удалось подтвердить удаление узла Kubernetes'
 
