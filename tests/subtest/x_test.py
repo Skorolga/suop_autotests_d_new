@@ -39,7 +39,7 @@ def test_x(pre_post_browser, browser):
             name=step_name,
             attachment_type=AttachmentType.PNG
         )
-    order_num = '132971'
+    order_num = '133964'
 
     # step_name = f'Заказ услуги kubernetes из витрины'
     # with allure.step(step_name):
@@ -52,8 +52,8 @@ def test_x(pre_post_browser, browser):
     #         attachment_type=AttachmentType.PNG
     #     )
 
-    step_name = f'Заказ услуги kubernetes из витрины'
-    # с созданным заказом
+    step_name = f'Операции с имеющимся заказом Kubernetes'
+    # с созданным заказом k8s
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         order_page.find_order(order_num)
@@ -81,10 +81,15 @@ def test_x(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Проверка вкладки Узлы'
+    # step_name = f'Проверка вкладки Узлы'
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     kuber_service.check_nodes_tab()
+
+    step_name = f'Проверка раздела Сеть'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_nodes_tab()
+        kuber_service.check_net_tab()
 
 
     # step_name = f'Удаление заказа'

@@ -1,7 +1,5 @@
 import time
-from asyncio import timeout
 from datetime import datetime
-from time import sleep
 
 import allure
 from allure_commons.types import AttachmentType
@@ -40,8 +38,16 @@ class KuberService(BasicPage):
     K8S_ORDER_NODES_ADD_NODES_DISK_SIZE = (By.XPATH, '//input[contains(@name, "datastore_size")]')  # Объем диска
     K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON = (By.XPATH, '//button[text()="Добавить"]')  # Кнопка добавления узла
     K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON = (By.XPATH, '//button[text()="Да"]')  # Кнопка добавления узла
-
-
+    K8S_ORDER_NET = (By.XPATH, '//button[contains(text(), "Сеть")]')  # Раздел Сеть в заказе k8s
+    K8S_ORDER_NET_TABLE_TITLE = (By.XPATH, '//th[text()="NAT правило"]'
+                                           '[following-sibling::th[1][text()="Статус"]]'
+                                           '[following-sibling::th[2][text()="ВМ"]]')  # Заголовок таблицы Сеть
+    K8S_ORDER_NET_ADD_RULE = (By.XPATH, '//span[text()="Добавить правило"]')
+    K8S_ORDER_NET_ADD_RULE_NAME = (By.XPATH, '//input[@name="title"]')  # поле ввода наименования правила
+    K8S_ORDER_NET_ADD_RULE_SOURCE = (By.XPATH, '//input[@name="source"]')  # поле ввода источника
+    K8S_ORDER_NET_ADD_RULE_DEST_PORT = (By.XPATH, '//input[@name="destination_port"]')  # поле ввода порт назначения
+    K8S_ORDER_NET_ADD_RULE_TRANSLATION = (By.XPATH, '//input[@name="translated"]')  # поле ввода адреса трансляции
+    K8S_ORDER_NET_ADD_RULE_TRANSLATION_PORT = (By.XPATH, '//input[@name="translated_port"]')  # поле ввода порта трансляции
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -170,6 +176,36 @@ class KuberService(BasicPage):
         time.sleep(3)  # ждем завершения анимации удаления узлов
         assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
             'Не удалось подтвердить удаление узла Kubernetes'
+
+    def check_net_tab(self):
+        self.click(self.K8S_ORDER_NET)  # Открываем вкладку Сеть
+        self.wait_for_page_loaded(self.K8S_ORDER_NET_TABLE_TITLE)
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Раздел Сеть',
+            attachment_type=AttachmentType.PNG
+        )
+        # Добавляет правило сети
+        self.click(self.K8S_ORDER_NET_ADD_RULE)
+        # rule_name = f'autotest{abs(hash(datetime.now()))}'
+        self.type(self.K8S_ORDER_NET_ADD_RULE_NAME, 'autotest')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_SOURCE, '10.10.10.10')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_DEST_PORT, '3232')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_TRANSLATION, '12.12.12.12')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_TRANSLATION_PORT, '3232')
+        time.sleep(0.5)  # Ждем завершения анимации для скриншота
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Форма добавления правила сети',
+            attachment_type=AttachmentType.PNG
+        )
+        self.click(self.K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON)
+        self.wait_for_page_loaded((By.XPATH, f'//td/div/p[text()="autotest"]'))
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Добавленное правило',
+            attachment_type=AttachmentType.PNG
+        )
 
 
 
