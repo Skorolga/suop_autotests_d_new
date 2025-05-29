@@ -8,6 +8,7 @@ from src.logger.formatted_logger import logger
 from src.pages.basic_page import BasicPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
+from src.pages.auth_page import AuthPage
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -20,6 +21,7 @@ class KuberService(BasicPage):
         super().__init__(browser)
         self.client_page = ClientPage(browser)
         self.order_page = OrdersPage(browser)
+        self.auth_page = AuthPage(browser)
 
     KUBER_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
@@ -37,7 +39,7 @@ class KuberService(BasicPage):
     K8S_ORDER_NODES_ADD_NODES_RAM = (By.XPATH, '//input[contains(@name, "vram")]')  # Количество RAM
     K8S_ORDER_NODES_ADD_NODES_DISK_SIZE = (By.XPATH, '//input[contains(@name, "datastore_size")]')  # Объем диска
     K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON = (By.XPATH, '//button[text()="Добавить"]')  # Кнопка добавления узла
-    K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON = (By.XPATH, '//button[text()="Да"]')  # Кнопка добавления узла
+    K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON = (By.XPATH, '//*[@id="simple_confirm"]/div/div/div/div[6]/div[2]/button')  # Кнопка добавления узла
     K8S_ORDER_NET = (By.XPATH, '//button[contains(text(), "Сеть")]')  # Раздел Сеть в заказе k8s
     K8S_ORDER_NET_TABLE_TITLE = (By.XPATH, '//th[text()="NAT правило"]'
                                            '[following-sibling::th[1][text()="Статус"]]'
@@ -103,13 +105,16 @@ class KuberService(BasicPage):
 
     def check_nodes_tab(self):
         """Проверка вкладки Узлы в заказе Kubernetes"""
-        self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
+        self.browser.refresh()
+        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_nodes()  # Открываем вкладку Узлы
         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Раздел Узлы',
             attachment_type=AttachmentType.PNG
         )
+        logger.info('Создание группы узлов')
         self.click(self.K8S_ORDER_NODES_ADD_NODES)
         # time.sleep(5)
         node_name = f'autotest{abs(hash(datetime.now()))}'  # Наименование группы узлов
@@ -133,20 +138,12 @@ class KuberService(BasicPage):
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
-        try:
-            self.click(self.K8S_ORDER_DROPDOWN)
-            self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
-        except Exception as e:
-            logger.info('Раскрыть заказ Kubernetes не потребовалось')
+        self.expand_k8s_order_nodes()
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
-        try:
-            self.click(self.K8S_ORDER_DROPDOWN)
-            self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
-        except Exception as e:
-            logger.info('Раскрыть заказ Kubernetes не потребовалось')
+        self.expand_k8s_order_nodes()
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
         assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
         allure.attach(
@@ -155,7 +152,7 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         # Удаление созданного узла
-        logger.info(f'Удаление созданного узла Kubernetes {node_name}')
+        logger.info(f'Удаление созданной группы узлов Kubernetes {node_name}')
         del_locator = (By.XPATH, f'//td[./div/p[contains(text(), "{node_name}")]]'
                               '//following-sibling::td[6]')
         self.click(del_locator)
@@ -164,10 +161,12 @@ class KuberService(BasicPage):
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
+        self.expand_k8s_order_nodes()
         self.order_page.text_check(self.ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
+        self.expand_k8s_order_nodes()
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Удаленная группа узлов',
@@ -186,6 +185,7 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         # Добавляет правило сети
+        logger.info('Добавление правила Сети')
         self.click(self.K8S_ORDER_NET_ADD_RULE)
         # rule_name = f'autotest{abs(hash(datetime.now()))}'
         self.type(self.K8S_ORDER_NET_ADD_RULE_NAME, 'autotest')
@@ -207,7 +207,14 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
 
-
+    def expand_k8s_order_nodes(self):
+        """Раскрывает заказ k8s, вкладку узлы фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
+        try:
+            self.click(self.K8S_ORDER_DROPDOWN, timeout=5)  # Раскрываем заказ k8s
+            self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
+            self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)  # Ожидаем загрузки данных раздела Узлы
+        except Exception as e:
+            logger.info('Раскрыть заказ Kubernetes не потребовалось')
 
     def del_k8s_order(self):
         """Удаление дочернего заказа Kubernetes"""

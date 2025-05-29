@@ -87,20 +87,25 @@ def test_kuber(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Вкладка раздела Информация'
+    step_name = f'Раздел Информация'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         kuber_service.check_info_tab()
         allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
+            body=kuber_service.browser.get_screenshot_as_png(),
             name= 'Раздел Информация',
             attachment_type=AttachmentType.PNG
         )
 
-    step_name = f'Проверка вкладки Узлы'
+    step_name = f'Раздел Узлы'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         kuber_service.check_nodes_tab()
+
+    step_name = f'Раздел Сеть'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.check_net_tab()
 
     step_name = f'Удаление заказа Kubernetes'
     with allure.step(step_name):

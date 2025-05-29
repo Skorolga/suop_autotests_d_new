@@ -62,17 +62,17 @@ class ClientPage(BasicPage):
                 continue
             order_num = ''.join([symb for symb in order_num if symb.isdigit()])
             if int(order_num) > 0:
-                logger.info(f'Создан заказ № {order_num}')
+                logger.info(f'Создан заказ Виртуальная инфраструктура №{order_num}')
                 break
             time.sleep(0.5)
         allure.attach(
             body=str(order_num),
-            name="Номер созданного заказа (дочернего)",
+            name="Номер созданного заказа Виртуальная инфраструктура (дочернего)",
             attachment_type=AttachmentType.TEXT,
         )
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Скриншот созданного заказа (дочернего)',
+            name='Скриншот заказа Виртуальная инфраструктура (дочернего)',
             attachment_type=AttachmentType.PNG
         )
         self.click(self.GO_TO_ORDER)
@@ -81,12 +81,12 @@ class ClientPage(BasicPage):
         parent_order_name = ''.join([symb for symb in parent_order_name if symb.isdigit()])
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Страница созданного заказа',
+            name='Страница созданного заказа Публичное облако',
             attachment_type=AttachmentType.PNG
         )
         allure.attach(
             body=str(order_num),
-            name="Номер созданного заказа (родительского)",
+            name="Номер созданного заказа Публичное облако (родительского)",
             attachment_type=AttachmentType.TEXT,
         )
         return parent_order_name
