@@ -27,6 +27,8 @@ class KuberService(BasicPage):
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
     ORDER_STATUS_TEXT = (By.XPATH, '//div[@class="suborder-state-status"]//p[@class="icon-hint__text"]')
     K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
+    K8S_ORDER_DROPDOWN_COLLAPSED = (By.XPATH, '//table//tbody/tr//td[5]'
+                                    '/div/button/div[not(contains(@class, "active"))]')  # Раскрыть заказ kubernetes (только свернутый)
     K8S_ORDER_INFO_TITLE = (By.XPATH, '//div[@class="heading-title"][contains(text(), "Параметры кластера Kubernetes")]')
     K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
     K8S_ORDER_DEL = (By.XPATH, '//*[@id="close"]/parent::*')  # Кнопка удаления заказа
@@ -56,7 +58,9 @@ class KuberService(BasicPage):
     K8S_ORDER_NET_DEL_RULE_MODAL_YES = (By.XPATH, '//button[text()="Да"]')  # Кнопка да в модальном окне удаления
     K8S_ORDER_VOLUMES = (By.XPATH, '//button[contains(text(), "Постоянные тома")]')  # Раздел Постоянные тома в заказе k8s
     K8S_ORDER_VOLUMES_TABLE_DATA = (By.XPATH, '//p[contains(text(), "Блочный")]')  # Данные из таблицы для ожидания загрузки
-
+    K8S_ORDER_VOLUMES_ADD = (By.XPATH, '//button[text()="Добавить хранилище постоянных томов"]')  # Кнопка добавления томов
+    K8S_ORDER_VOLUMES_SAS = (By.XPATH, '//input[contains(@name, "sas")]')  # Поле формы добавления объема диска (тома)
+    K8S_ORDER_VOLUMES_SAVE_FORM = (By.XPATH, '//button[text()="Сохранить"]')  # Кнопка сохранить модального окна
 
     def make_k8s_order(self, timeout=360) -> str | bool:
         """Создает заказ kubernetes"""
@@ -245,6 +249,32 @@ class KuberService(BasicPage):
             name='Раздел Постоянные тома',
             attachment_type=AttachmentType.PNG
         )
+        # Добавление тома
+        self.click(self.K8S_ORDER_VOLUMES_ADD)
+        self.custom_clear(self.K8S_ORDER_VOLUMES_SAS)
+        self.type(self.K8S_ORDER_VOLUMES_SAS, '10')
+        time.sleep(0.5)  # Ждем завершения анимации
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Форма добавления тома',
+            attachment_type=AttachmentType.PNG
+        )
+        self.click(self.K8S_ORDER_VOLUMES_SAVE_FORM)
+        WebDriverWait(self.browser, 60).until(
+            EC.invisibility_of_element(
+                self.K8S_ORDER_VOLUMES_SAVE_FORM))  # Ждем когда элемент исчезнет
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Работает',
+                                   refresh_timeout=60 * 10,
+                                   hover_element=self.ORDER_STATUS)
+        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_volumes()
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Добавленный том',
+            attachment_type=AttachmentType.PNG
+        )
+
 
 
     def expand_k8s_order_nodes(self):
@@ -259,7 +289,7 @@ class KuberService(BasicPage):
     def expand_k8s_order_volumes(self):
         """Раскрывает заказ k8s, вкладку Постоянные тома фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
         try:
-            self.click(self.K8S_ORDER_DROPDOWN, timeout=5)  # Раскрываем заказ k8s
+            self.click(self.K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
             self.click(self.K8S_ORDER_VOLUMES)  # Открываем вкладку Узлы
             self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES)  # Ожидаем загрузки данных раздела Узлы
         except Exception as e:
