@@ -16,7 +16,7 @@ class ClientPage(BasicPage):
     BUTTON_MAKE_ORDER = (By.XPATH, '//button[contains(text(), "Заказать")]')
     TABLE_WITH_ORDERS_IN_LK = (By.XPATH, '//div[contains(@class, "items-table__dropdown")]')  # Проверка загрузки стр. с заказами
 
-    # локаторы заказа за клиента
+    # Локаторы заказа за клиента
     FORM_TITLE_CONF = (By.XPATH, '//h3[contains(text(), "Конфигурация")]')  # Для проверки загрузки страницы с формой заказа iaas
     RADIOBUTTON_NEW_ORDER = (By.XPATH, '//div[contains(text(), "Создать новый заказ")]')  # Радиобаттон создать iaas в новом заказе
     COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')

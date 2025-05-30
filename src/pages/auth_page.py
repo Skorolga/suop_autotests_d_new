@@ -33,7 +33,9 @@ class AuthPage(BasicPage):
     PROFILE_NAME_ADMIN = (By.XPATH, f'//p[text()="{SUOP.ORGANIZATION_ADMIN}"]')  # Для проверки выбора роли Администратор СУ ОП
     PROFILE_NAME_MANAGER = (By.XPATH, f'//p[text()="{SUOP.ORGANIZATION_MANAGER}"]')  # Для проверки выбора роли менеджер
     PROFILE_NAME_CLIENT = (By.XPATH, f'''//p[text()='{SUOP.ORGANIZATION_CLIENT}']''')  # Для проверки выбора роли Клиента
-    PROFILE_NAME = (By.XPATH, f'''//div[@class="wrapper--profile"]//div[@class="text"]//div//p[contains(@class, "grLHgo")]''')  # Для получения имени организации
+    PROFILE_NAME = (By.XPATH, f'''//div[@class="wrapper--profile"]
+                                  //div[@class="text"]//div
+                                  //p[contains(@class, "grLHgo")]''')  # Для получения имени организации
 
 
     def __init__(self, browser, url=None):
