@@ -68,7 +68,7 @@ class OrdersPage(BasicPage):
         self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         composite_locator = (By.XPATH, f'//div[@class="orderRow"]//div[contains(text(),"{num_order}")] | '
                                        f'//td[contains(text(),"{num_order}")]')
-        self.wait_for_page_loaded(composite_locator, 15)  # TODO локаторы клиента и администратора отличаются (под клиентом верстка элемента в <table>)
+        self.wait_for_page_loaded(composite_locator, 15)  # Локаторы клиента и администратора отличаются (под клиентом верстка элемента в <table>)
         profile = self.find_elem(AuthPage.PROFILE_NAME, 5)
         # logger.info(f'{profile.text} == {SUOP.ORGANIZATION_CLIENT}')
         if type(profile) != bool and profile.text == SUOP.ORGANIZATION_CLIENT:

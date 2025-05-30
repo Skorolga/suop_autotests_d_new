@@ -45,11 +45,15 @@ class KuberService(BasicPage):
                                            '[following-sibling::th[1][text()="Статус"]]'
                                            '[following-sibling::th[2][text()="ВМ"]]')  # Заголовок таблицы Сеть
     K8S_ORDER_NET_ADD_RULE = (By.XPATH, '//span[text()="Добавить правило"]')
-    K8S_ORDER_NET_ADD_RULE_NAME = (By.XPATH, '//input[@name="title"]')  # поле ввода наименования правила
-    K8S_ORDER_NET_ADD_RULE_SOURCE = (By.XPATH, '//input[@name="source"]')  # поле ввода источника
-    K8S_ORDER_NET_ADD_RULE_DEST_PORT = (By.XPATH, '//input[@name="destination_port"]')  # поле ввода порт назначения
-    K8S_ORDER_NET_ADD_RULE_TRANSLATION = (By.XPATH, '//input[@name="translated"]')  # поле ввода адреса трансляции
-    K8S_ORDER_NET_ADD_RULE_TRANSLATION_PORT = (By.XPATH, '//input[@name="translated_port"]')  # поле ввода порта трансляции
+    K8S_ORDER_NET_ADD_RULE_NAME = (By.XPATH, '//input[@name="title"]')  # Поле ввода наименования правила
+    K8S_ORDER_NET_ADD_RULE_SOURCE = (By.XPATH, '//input[@name="source"]')  # Поле ввода источника
+    K8S_ORDER_NET_ADD_RULE_DEST_PORT = (By.XPATH, '//input[@name="destination_port"]')  # Поле ввода порт назначения
+    K8S_ORDER_NET_ADD_RULE_TRANSLATION = (By.XPATH, '//input[@name="translated"]')  # Поле ввода адреса трансляции
+    K8S_ORDER_NET_ADD_RULE_TRANSLATION_PORT = (By.XPATH, '//input[@name="translated_port"]')  # Поле ввода порта трансляции
+    K8S_ORDER_NET_ADDED_RULE = (By.XPATH, '//td/div/p[text()="autotest"]')  # Добавленное правило
+    K8S_ORDER_NET_DEL_RULE = (By.XPATH, '//td[div/p[text()="autotest"]]'
+                                        '//following-sibling::td[11]')  # Удаление сетевого правила
+    K8S_ORDER_NET_DEL_RULE_MODAL_YES = (By.XPATH, '//button[text()="Да"]')  # Кнопка да в модальном окне удаления
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -189,9 +193,9 @@ class KuberService(BasicPage):
         self.click(self.K8S_ORDER_NET_ADD_RULE)
         # rule_name = f'autotest{abs(hash(datetime.now()))}'
         self.type(self.K8S_ORDER_NET_ADD_RULE_NAME, 'autotest')
-        self.type(self.K8S_ORDER_NET_ADD_RULE_SOURCE, '10.10.10.10')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_SOURCE, '192.168.2.1')
         self.type(self.K8S_ORDER_NET_ADD_RULE_DEST_PORT, '3232')
-        self.type(self.K8S_ORDER_NET_ADD_RULE_TRANSLATION, '12.12.12.12')
+        self.type(self.K8S_ORDER_NET_ADD_RULE_TRANSLATION, '192.168.2.2')
         self.type(self.K8S_ORDER_NET_ADD_RULE_TRANSLATION_PORT, '3232')
         time.sleep(0.5)  # Ждем завершения анимации для скриншота
         allure.attach(
@@ -200,10 +204,27 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         self.click(self.K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON)
-        self.wait_for_page_loaded((By.XPATH, f'//td/div/p[text()="autotest"]'))
+        self.wait_for_page_loaded(self.K8S_ORDER_NET_ADDED_RULE)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Добавленное правило',
+            attachment_type=AttachmentType.PNG
+        )
+        # Удаление сетевого правила
+        self.click(self.K8S_ORDER_NET_DEL_RULE)
+        self.click(self.K8S_ORDER_NET_DEL_RULE_MODAL_YES)
+        WebDriverWait(self.browser, 60).until(
+            EC.invisibility_of_element(OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
+        WebDriverWait(self.browser, 60).until(
+            EC.invisibility_of_element(
+                self.K8S_ORDER_NET_ADDED_RULE))  # Ждем когда правило Сети исчезнет
+        if self.find_elem(self.K8S_ORDER_NET_ADDED_RULE, timeout=5):
+            logger.warning('Созданное правило не удалено')
+        else:
+            logger.info('Созданное правило успешно удалено')
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Удаленное правило',
             attachment_type=AttachmentType.PNG
         )
 
