@@ -81,15 +81,20 @@ def test_x(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-    # step_name = f'Проверка вкладки Узлы'
-    # with allure.step(step_name):
-    #     logger.info('Шаг: ' + step_name)
-    #     kuber_service.check_nodes_tab()
-
-    step_name = f'Проверка раздела Сеть'
+    step_name = f'Проверка вкладки Узлы'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_net_tab()
+        kuber_service.check_nodes_tab()
+
+    # step_name = f'Проверка раздела Сеть'
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     kuber_service.check_net_tab()
+
+    step_name = f'Проверка раздела Постоянные тома'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.check_volume_tab()
 
 
     # step_name = f'Удаление заказа'

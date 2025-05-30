@@ -54,6 +54,8 @@ class KuberService(BasicPage):
     K8S_ORDER_NET_DEL_RULE = (By.XPATH, '//td[div/p[text()="autotest"]]'
                                         '//following-sibling::td[11]')  # Удаление сетевого правила
     K8S_ORDER_NET_DEL_RULE_MODAL_YES = (By.XPATH, '//button[text()="Да"]')  # Кнопка да в модальном окне удаления
+    K8S_ORDER_VOLUMES = (By.XPATH, '//button[contains(text(), "Постоянные тома")]')  # Раздел Постоянные тома в заказе k8s
+    K8S_ORDER_VOLUMES_TABLE_DATA = (By.XPATH, '//p[contains(text(), "Блочный")]')  # Данные из таблицы для ожидания загрузки
 
 
     def make_k8s_order(self, timeout=360) -> str | bool:
@@ -113,6 +115,7 @@ class KuberService(BasicPage):
         self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
         self.expand_k8s_order_nodes()  # Открываем вкладку Узлы
         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
+        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Раздел Узлы',
@@ -150,6 +153,7 @@ class KuberService(BasicPage):
         self.expand_k8s_order_nodes()
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
         assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
+        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Созданная группа узлов',
@@ -171,6 +175,7 @@ class KuberService(BasicPage):
                                    refresh_timeout=60 * 3,
                                    hover_element=self.ORDER_STATUS)
         self.expand_k8s_order_nodes()
+        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Удаленная группа узлов',
@@ -228,12 +233,35 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
 
+    def check_volume_tab(self):
+        """Проверка вкладки Постоянные тома в заказе Kubernetes"""
+        self.browser.refresh()
+        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_volumes()
+        self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES_TABLE_DATA)
+        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Раздел Постоянные тома',
+            attachment_type=AttachmentType.PNG
+        )
+
+
     def expand_k8s_order_nodes(self):
         """Раскрывает заказ k8s, вкладку узлы фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
         try:
             self.click(self.K8S_ORDER_DROPDOWN, timeout=5)  # Раскрываем заказ k8s
             self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
             self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)  # Ожидаем загрузки данных раздела Узлы
+        except Exception as e:
+            logger.info('Раскрыть заказ Kubernetes не потребовалось')
+
+    def expand_k8s_order_volumes(self):
+        """Раскрывает заказ k8s, вкладку Постоянные тома фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
+        try:
+            self.click(self.K8S_ORDER_DROPDOWN, timeout=5)  # Раскрываем заказ k8s
+            self.click(self.K8S_ORDER_VOLUMES)  # Открываем вкладку Узлы
+            self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES)  # Ожидаем загрузки данных раздела Узлы
         except Exception as e:
             logger.info('Раскрыть заказ Kubernetes не потребовалось')
 
