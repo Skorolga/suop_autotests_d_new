@@ -107,6 +107,11 @@ def test_kuber(pre_post_browser, browser):
         logger.info('Шаг: ' + step_name)
         kuber_service.check_net_tab()
 
+    step_name = f'Проверка раздела Постоянные тома'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        kuber_service.check_volume_tab()
+
     step_name = f'Удаление заказа Kubernetes'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)

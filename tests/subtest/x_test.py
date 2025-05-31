@@ -41,16 +41,16 @@ def test_x(pre_post_browser, browser):
         )
     order_num = '133964'
 
-    # step_name = f'Заказ услуги kubernetes из витрины'
-    # with allure.step(step_name):
-    #     logger.info('Шаг: ' + step_name)
-    #     auth_page.auth_as_client()
-    #     kuber_service.make_k8s_order()
-    #     allure.attach(
-    #         body=auth_page.browser.get_screenshot_as_png(),
-    #         name='Страница созданного заказа',
-    #         attachment_type=AttachmentType.PNG
-    #     )
+    step_name = f'Заказ услуги kubernetes из витрины'
+    with allure.step(step_name):
+        logger.info('Шаг: ' + step_name)
+        auth_page.auth_as_client()
+        kuber_service.make_k8s_order()
+        allure.attach(
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Страница созданного заказа',
+            attachment_type=AttachmentType.PNG
+        )
 
     step_name = f'Операции с имеющимся заказом Kubernetes'
     # с созданным заказом k8s

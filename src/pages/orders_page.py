@@ -95,7 +95,7 @@ class OrdersPage(BasicPage):
         :param locator: локатор в котором проверяется текст
         :param text_trigger: ожидаемый текст
         :param timeout: таймаут для цикла проверки
-        :param refresh_timeout: таймаут для обновления
+        :param refresh_timeout: таймаут для обновления страницы
         :param hover_element: навести курсор на элемент перед считыванием текста
         :return: bool
         """
@@ -130,6 +130,9 @@ class OrdersPage(BasicPage):
             if type(elem_for_actual_text) != str:
                 time.sleep(2)
                 continue
+            if elem_for_actual_text == 'Ошибка':
+                logger.error('Заказ перешел в состояние Ошибка')
+                assert False, 'Заказ перешел в состояние Ошибка'
             if elem_for_actual_text == text_trigger:
                 logger.info(f'Ожидаемое состояние достигнуто: {text_trigger} за {time_difference} сек')
                 return True
@@ -142,7 +145,7 @@ class OrdersPage(BasicPage):
             if int(time_difference.total_seconds()) > refresh_timeout:
                 self.browser.refresh()
                 time.sleep(5)
-                self.browser.refresh()  # Баг с правами, нужно доп. перезагрузка
+                self.browser.refresh()  # Баг с правами, нужна доп. перезагрузка
                 start_time_refresh = datetime.now()
             time.sleep(2)
 
