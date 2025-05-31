@@ -61,6 +61,10 @@ class KuberService(BasicPage):
     K8S_ORDER_VOLUMES_ADD = (By.XPATH, '//button[text()="Добавить хранилище постоянных томов"]')  # Кнопка добавления томов
     K8S_ORDER_VOLUMES_SAS = (By.XPATH, '//input[contains(@name, "sas")]')  # Поле формы добавления объема диска (тома)
     K8S_ORDER_VOLUMES_SAVE_FORM = (By.XPATH, '//button[text()="Сохранить"]')  # Кнопка сохранить модального окна
+    K8S_ORDER_VOLUMES_ADDED_VOLUME = (By.XPATH, '//td//*[contains(text(), "Файловый")]')  # Добавленный том (строка в табл.)
+    K8S_ORDER_VOLUMES_DEL = (By.XPATH, '//td//*[contains(text(), "Файловый")]'
+                                       '//ancestor::td[1]/following-sibling::td[4]')  # Кнопка удаления тома
+
 
     def make_k8s_order(self, timeout=360) -> str | bool:
         """Создает заказ kubernetes"""
@@ -223,7 +227,7 @@ class KuberService(BasicPage):
         self.click(self.K8S_ORDER_NET_DEL_RULE)
         self.click(self.K8S_ORDER_NET_DEL_RULE_MODAL_YES)
         WebDriverWait(self.browser, 60).until(
-            EC.invisibility_of_element(OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда элемент исчезнет
+            EC.invisibility_of_element(OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда Ждем когда иконка ожидания исчезнет
         WebDriverWait(self.browser, 60).until(
             EC.invisibility_of_element(
                 self.K8S_ORDER_NET_ADDED_RULE))  # Ждем когда правило Сети исчезнет
@@ -250,6 +254,7 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         # Добавление тома
+        logger.info('Добавление тома')
         self.click(self.K8S_ORDER_VOLUMES_ADD)
         self.custom_clear(self.K8S_ORDER_VOLUMES_SAS)
         self.type(self.K8S_ORDER_VOLUMES_SAS, '10')
@@ -272,6 +277,27 @@ class KuberService(BasicPage):
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Добавленный том',
+            attachment_type=AttachmentType.PNG
+        )
+        # Удаление тома
+        logger.info('Удаление добавленного тома')
+        self.click(self.K8S_ORDER_VOLUMES_DEL)
+        self.click(OrdersPage.ORDER_DELETE_MODAL_YES)
+        # WebDriverWait(self.browser, 60).until(
+        #     EC.invisibility_of_element(
+        #         OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда иконка ожидания исчезнет
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Удаление хранилища',
+                                   hover_element=self.ORDER_STATUS)
+        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   'Работает',
+                                   hover_element=self.ORDER_STATUS)
+        WebDriverWait(self.browser, 60).until(
+            EC.invisibility_of_element(
+                self.K8S_ORDER_VOLUMES_ADDED_VOLUME))  # Ждем когда элемент исчезнет
+        allure.attach(
+            body=self.browser.get_screenshot_as_png(),
+            name='Удаленный том',
             attachment_type=AttachmentType.PNG
         )
 
