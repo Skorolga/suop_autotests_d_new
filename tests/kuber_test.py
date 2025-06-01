@@ -80,17 +80,16 @@ def test_kuber(pre_post_browser, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.auth_as_client()
-        kuber_service.make_k8s_order()
+        _, kaas_name = kuber_service.make_k8s_order()
         allure.attach(
             body=kuber_service.browser.get_screenshot_as_png(),
             name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
-
     step_name = f'Раздел Информация'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_info_tab()
+        kuber_service.check_info_tab(kaas_name)
         allure.attach(
             body=kuber_service.browser.get_screenshot_as_png(),
             name= 'Раздел Информация',
@@ -100,22 +99,22 @@ def test_kuber(pre_post_browser, browser):
     step_name = f'Раздел Узлы'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_nodes_tab()
+        kuber_service.check_nodes_tab(kaas_name)
 
     step_name = f'Раздел Сеть'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_net_tab()
+        kuber_service.check_net_tab(kaas_name)
 
     step_name = f'Проверка раздела Постоянные тома'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.check_volume_tab()
+        kuber_service.check_volume_tab(kaas_name)
 
     step_name = f'Удаление заказа Kubernetes'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        kuber_service.del_k8s_order()
+        kuber_service.del_k8s_order(kaas_name)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
             name='Удаленный заказ',
