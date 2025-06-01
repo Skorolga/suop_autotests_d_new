@@ -32,7 +32,6 @@ def browser():
 
 @pytest.fixture
 def pre_post_browser(browser):
-    """TODO вынести в отдельную фикстуру, в conftest.py"""
     yield
     browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
 
@@ -63,7 +62,7 @@ def pytest_runtest_makereport(item, call):
             screenshot = browser.get_screenshot_as_png()
             allure.attach(
                 screenshot,
-                name=f"Скриншот ошибки",
+                name=f'Скриншот ошибки',
                 attachment_type=allure.attachment_type.PNG,
             )
 
