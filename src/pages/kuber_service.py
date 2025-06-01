@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+from typing import Tuple
 
 import allure
 from allure_commons.types import AttachmentType
@@ -26,9 +27,10 @@ class KuberService(BasicPage):
     KUBER_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
     ORDER_STATUS_TEXT = (By.XPATH, '//div[@class="suborder-state-status"]//p[@class="icon-hint__text"]')
-    K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
-    K8S_ORDER_DROPDOWN_COLLAPSED = (By.XPATH, '//table//tbody/tr//td[5]'
-                                    '/div/button/div[not(contains(@class, "active"))]')  # Раскрыть заказ kubernetes (только свернутый)
+    # K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
+    # K8S_ORDER_DROPDOWN_COLLAPSED = (By.XPATH, '//table//tbody/tr//td[5]'
+    #                                 '/div/button/div[not(contains(@class, "active"))]')  # Раскрыть заказ kubernetes (только свернутый)
+    K8S_ORDER_NAME_FIELD = (By.XPATH, '//*[@name="title"]')  # Форма создания kaas, наименование заказа
     K8S_ORDER_INFO_TITLE = (By.XPATH, '//div[@class="heading-title"][contains(text(), "Параметры кластера Kubernetes")]')
     K8S_ORDER_INFO_DATE = (By.XPATH, '//div[contains(text(), "Дата создания")]')
     K8S_ORDER_DEL = (By.XPATH, '//*[@id="close"]/parent::*')  # Кнопка удаления заказа
@@ -66,7 +68,7 @@ class KuberService(BasicPage):
                                        '//ancestor::td[1]/following-sibling::td[4]')  # Кнопка удаления тома
 
 
-    def make_k8s_order(self, timeout=360) -> str | bool:
+    def make_k8s_order(self, timeout=360) -> bool | tuple[str, str]:
         """Создает заказ kubernetes"""
         logger.info('Создание заказа kubernetes')
         self.click(ClientPage.MENU_MAKE_ORDER)  # Верхнее меню
@@ -77,6 +79,8 @@ class KuberService(BasicPage):
         cost = self.client_page.check_cost(ClientPage.COST_WITHOUT_TAX)
         logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
         assert cost, f'Ошибка в начислении суммы заказа по локатору {ClientPage.COST_WITHOUT_TAX}'
+        kaas_name = self.find_elem(self.K8S_ORDER_NAME_FIELD).get_attribute("value")
+        logger.info(f'Наименование kaas: {kaas_name}')
         self.click(ClientPage.SUBMIT_BUTTON)  # Итоговая кнопка создания заказа
         # ждем создания заказа и получаем его номер
         self.wait_for_page_loaded(ClientPage.NEW_ORDER_NUM, 180)
@@ -105,25 +109,39 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
         self.click(ClientPage.GO_TO_ORDER)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                       f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
+        ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                  f'//following-sibling::td[2]'
+                                  f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60*3,
-                                   hover_element=self.ORDER_STATUS)
+                                   hover_element=ORDER_STATUS)
+        return order_num, kaas_name
 
-    def check_info_tab(self):
+    def check_info_tab(self, kaas_name):
         """Проверка вкладки Информация в заказе Kubernetes"""
-        self.click(self.K8S_ORDER_DROPDOWN)  # TODO вынести в отдельную фн.
+        K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
+        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        self.click(K8S_ORDER_DROPDOWN)
         elem_for_scroll = self.find_elem(self.K8S_ORDER_INFO_DATE)
         self.scroll_to_element(elem_for_scroll)
         assert self.wait_for_page_loaded(self.K8S_ORDER_INFO_TITLE), 'Отсутствует заголовок вкладки Информация'
 
-    def check_nodes_tab(self):
+    def check_nodes_tab(self, kaas_name):
         """Проверка вкладки Узлы в заказе Kubernetes"""
+        K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
+        ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                       f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
+        ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                  f'//following-sibling::td[2]'
+                                  f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
         self.browser.refresh()
-        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order_nodes()  # Открываем вкладку Узлы
+        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_nodes(kaas_name)  # Открываем вкладку Узлы
         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
-        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
+        self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Раздел Узлы',
@@ -149,19 +167,19 @@ class KuberService(BasicPage):
         )
         # Добавление новых узлов
         self.click(self.K8S_ORDER_NODES_ADD_NODES_ADD_BUTTON)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
-                                   hover_element=self.ORDER_STATUS)
-        self.expand_k8s_order_nodes()
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   hover_element=ORDER_STATUS)
+        self.expand_k8s_order_nodes(kaas_name)
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
-                                   hover_element=self.ORDER_STATUS)
-        self.expand_k8s_order_nodes()
+                                   hover_element=ORDER_STATUS)
+        self.expand_k8s_order_nodes(kaas_name)
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
         assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
-        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
+        self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Созданная группа узлов',
@@ -169,21 +187,21 @@ class KuberService(BasicPage):
         )
         # Удаление созданного узла
         logger.info(f'Удаление созданной группы узлов Kubernetes {node_name}')
-        del_locator = (By.XPATH, f'//td[./div/p[contains(text(), "{node_name}")]]'
+        DEL_NODE_LOCATOR = (By.XPATH, f'//td[./div/p[contains(text(), "{node_name}")]]'
                               '//following-sibling::td[6]')
-        self.click(del_locator)
+        self.click(DEL_NODE_LOCATOR)
         self.click(self.K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
-                                   hover_element=self.ORDER_STATUS)
-        self.expand_k8s_order_nodes()
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   hover_element=ORDER_STATUS)
+        self.expand_k8s_order_nodes(kaas_name)
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
-                                   hover_element=self.ORDER_STATUS)
-        self.expand_k8s_order_nodes()
-        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
+                                   hover_element=ORDER_STATUS)
+        self.expand_k8s_order_nodes(kaas_name)
+        # self.scroll_to_element(self.find_elem(self.))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Удаленная группа узлов',
@@ -193,7 +211,8 @@ class KuberService(BasicPage):
         assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
             'Не удалось подтвердить удаление узла Kubernetes'
 
-    def check_net_tab(self):
+    def check_net_tab(self, kaas_name):
+        K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
         self.click(self.K8S_ORDER_NET)  # Открываем вкладку Сеть
         self.wait_for_page_loaded(self.K8S_ORDER_NET_TABLE_TITLE)
         allure.attach(
@@ -204,7 +223,6 @@ class KuberService(BasicPage):
         # Добавляет правило сети
         logger.info('Добавление правила Сети')
         self.click(self.K8S_ORDER_NET_ADD_RULE)
-        # rule_name = f'autotest{abs(hash(datetime.now()))}'
         self.type(self.K8S_ORDER_NET_ADD_RULE_NAME, 'autotest')
         self.type(self.K8S_ORDER_NET_ADD_RULE_SOURCE, '192.168.2.1')
         self.type(self.K8S_ORDER_NET_ADD_RULE_DEST_PORT, '3232')
@@ -241,13 +259,21 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
 
-    def check_volume_tab(self):
+    def check_volume_tab(self, kaas_name):
         """Проверка вкладки Постоянные тома в заказе Kubernetes"""
+        K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
+        ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                       f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
+        ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                  f'//following-sibling::td[2]'
+                                  f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
         self.browser.refresh()
-        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order_volumes()
+        time.sleep(5)
+        self.browser.refresh()  # Баг с правами, нужна доп. перезагрузка
+        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_volumes(kaas_name)
         self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES_TABLE_DATA)
-        self.scroll_to_element(self.find_elem(self.K8S_ORDER_DROPDOWN))
+        self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Раздел Постоянные тома',
@@ -268,12 +294,12 @@ class KuberService(BasicPage):
         WebDriverWait(self.browser, 60).until(
             EC.invisibility_of_element(
                 self.K8S_ORDER_VOLUMES_SAVE_FORM))  # Ждем когда элемент исчезнет
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 10,
-                                   hover_element=self.ORDER_STATUS)
-        self.wait_for_page_loaded(self.K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order_volumes()
+                                   hover_element=ORDER_STATUS)
+        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        self.expand_k8s_order_volumes(kaas_name)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Добавленный том',
@@ -286,12 +312,12 @@ class KuberService(BasicPage):
         # WebDriverWait(self.browser, 60).until(
         #     EC.invisibility_of_element(
         #         OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда иконка ожидания исчезнет
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Удаление хранилища',
-                                   hover_element=self.ORDER_STATUS)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+                                   hover_element=ORDER_STATUS)
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
-                                   hover_element=self.ORDER_STATUS)
+                                   hover_element=ORDER_STATUS)
         WebDriverWait(self.browser, 60).until(
             EC.invisibility_of_element(
                 self.K8S_ORDER_VOLUMES_ADDED_VOLUME))  # Ждем когда элемент исчезнет
@@ -302,40 +328,57 @@ class KuberService(BasicPage):
         )
 
 
-
-    def expand_k8s_order_nodes(self):
+    def expand_k8s_order_nodes(self, kaas_name):
         """Раскрывает заказ k8s, вкладку узлы фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
+        # Подготовка локатора свернутого kaas
+        K8S_ORDER_DROPDOWN_COLLAPSED = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                                  f'/following-sibling::td[4]'
+                                                  f'/div/button/div[not(contains(@class, "active"))]')
         try:
-            self.click(self.K8S_ORDER_DROPDOWN, timeout=5)  # Раскрываем заказ k8s
+            self.click(K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
             self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
             self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)  # Ожидаем загрузки данных раздела Узлы
         except Exception as e:
             logger.info('Раскрыть заказ Kubernetes не потребовалось')
 
-    def expand_k8s_order_volumes(self):
+    def expand_k8s_order_volumes(self, kaas_name):
         """Раскрывает заказ k8s, вкладку Постоянные тома фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
+        K8S_ORDER_DROPDOWN_COLLAPSED = (
+        By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                  f'/following-sibling::td[4]'
+                  f'/div/button/div[not(contains(@class, "active"))]')
         try:
-            self.click(self.K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
+            self.click(K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
             self.click(self.K8S_ORDER_VOLUMES)  # Открываем вкладку Узлы
             self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES)  # Ожидаем загрузки данных раздела Узлы
         except Exception as e:
             logger.info('Раскрыть заказ Kubernetes не потребовалось')
 
-    def del_k8s_order(self):
+    def del_k8s_order(self, kaas_name):
         """Удаление дочернего заказа Kubernetes"""
-        elem_for_del = (By.XPATH, '//td/div/*[contains(text(), "Кластер Kubernetes")]/following::td[3]//*[@id="close"]')
-        self.click(elem_for_del)
+        KAAS_FOR_DEL_LOCATOR = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                          f'/following-sibling::td[3]//*[@id="close"]')
+        ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                       f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
+        ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+                                  f'//following-sibling::td[2]'
+                                  f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
+        self.click(KAAS_FOR_DEL_LOCATOR)
         self.click(OrdersPage.ORDER_POWER_OFF_MODAL_YES)
         self.find_elem(self.ORDER_STATUS_TEXT)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Удаление сетевой связности',
                                    refresh_timeout=60*3,
-                                   hover_element=self.ORDER_STATUS)
-        self.order_page.text_check(self.ORDER_STATUS_TEXT,
-                                   'Удаление кластера',
-                                   refresh_timeout=60*3,
-                                   hover_element=self.ORDER_STATUS)
+                                   hover_element=ORDER_STATUS)
+        # self.order_page.text_check(self.ORDER_STATUS_TEXT,
+        #                            'Удаление кластера',
+        #                            refresh_timeout=60*3,
+        #                            hover_element=self.ORDER_STATUS)
         WebDriverWait(self.browser, 60*30).until(
-            EC.invisibility_of_element_located((By.XPATH, '//td/div/*[contains(text(), "Кластер Kubernetes")]'))
+            EC.invisibility_of_element_located(KAAS_FOR_DEL_LOCATOR)
         )  # Ждем когда элемент исчезнет
-        assert self.find_elem(elem_for_del, 10) == False  # Ждем удаления
+        assert self.find_elem(KAAS_FOR_DEL_LOCATOR, 10) == False  # Ждем удаления
+
+    def make_locator_kaas(self, kaas_name) -> tuple[str, str]:
+        """Возвращает локатор заказа kaas"""
+        return By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]/following-sibling::td[4]'
