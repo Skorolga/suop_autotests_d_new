@@ -138,6 +138,8 @@ class KuberService(BasicPage):
                                   f'//following-sibling::td[2]'
                                   f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
         self.browser.refresh()
+        time.sleep(5)
+        self.browser.refresh()
         self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
         self.expand_k8s_order_nodes(kaas_name)  # Открываем вкладку Узлы
         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
@@ -207,12 +209,14 @@ class KuberService(BasicPage):
             name='Удаленная группа узлов',
             attachment_type=AttachmentType.PNG
         )
-        time.sleep(3)  # ждем завершения анимации удаления узлов
+        time.sleep(10)  # ждем завершения анимации удаления узлов
         assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
             'Не удалось подтвердить удаление узла Kubernetes'
 
     def check_net_tab(self, kaas_name):
-        K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
+        """Проверка раздела Сеть"""
+        logger.info('Проверка раздела Сети')
+        # K8S_ORDER_DROPDOWN = self.make_locator_kaas(kaas_name)
         self.click(self.K8S_ORDER_NET)  # Открываем вкладку Сеть
         self.wait_for_page_loaded(self.K8S_ORDER_NET_TABLE_TITLE)
         allure.attach(
