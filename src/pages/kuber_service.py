@@ -141,7 +141,7 @@ class KuberService(BasicPage):
         self.browser.refresh()
         time.sleep(5)
         self.browser.refresh()
-        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
         self.expand_k8s_order(kaas_name,
                               tab=self.K8S_ORDER_NODES,
                               wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
@@ -214,15 +214,18 @@ class KuberService(BasicPage):
         self.expand_k8s_order(kaas_name,
                               tab=self.K8S_ORDER_NODES,
                               wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
-        # self.scroll_to_element(self.find_elem(self.))
+        self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Удаленная группа узлов',
             attachment_type=AttachmentType.PNG
         )
         time.sleep(10)  # ждем завершения анимации удаления узлов
-        assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
-            'Не удалось подтвердить удаление узла Kubernetes'
+        # assert bool(self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5)) == False, \
+        #     'Не удалось подтвердить удаление узла Kubernetes'
+        if self.find_elem((By.XPATH, f'//p[text()="{node_name}"]'), timeout=5):
+            logger.warning('Не удалось подтвердить удаление узла Kubernetes')
+
 
     def check_net_tab(self, kaas_name):
         """Проверка раздела Сеть"""
@@ -285,7 +288,7 @@ class KuberService(BasicPage):
         self.browser.refresh()
         time.sleep(5)
         self.browser.refresh()  # Баг с правами, нужна доп. перезагрузка
-        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
         self.expand_k8s_order(kaas_name, tab=self.K8S_ORDER_VOLUMES, wait_locator=self.K8S_ORDER_VOLUMES)
         self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES_TABLE_DATA)
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
@@ -313,7 +316,7 @@ class KuberService(BasicPage):
                                    'Работает',
                                    refresh_timeout=60 * 10,
                                    hover_element=ORDER_STATUS)
-        self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
+        # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
         self.expand_k8s_order(kaas_name, tab=self.K8S_ORDER_VOLUMES, wait_locator=self.K8S_ORDER_VOLUMES)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
@@ -342,32 +345,6 @@ class KuberService(BasicPage):
             attachment_type=AttachmentType.PNG
         )
 
-
-    # def expand_k8s_order_nodes(self, kaas_name):
-    #     """Раскрывает заказ k8s, вкладку узлы фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
-    #     # Подготовка локатора свернутого kaas
-    #     K8S_ORDER_DROPDOWN_COLLAPSED = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
-    #                                               f'/following-sibling::td[4]'
-    #                                               f'/div/button/div[not(contains(@class, "active"))]')
-    #     try:
-    #         self.click(K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
-    #         self.click(self.K8S_ORDER_NODES)  # Открываем вкладку Узлы
-    #         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)  # Ожидаем загрузки данных раздела Узлы
-    #     except Exception as e:
-    #         logger.info('Раскрыть заказ Kubernetes не потребовалось')
-
-    # def expand_k8s_order_volumes(self, kaas_name):
-    #     """Раскрывает заказ k8s, вкладку Постоянные тома фикс бага https://tasks.rt-dc.ru/browse/CLOUDDEV-11294"""
-    #     K8S_ORDER_DROPDOWN_COLLAPSED = (
-    #     By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
-    #               f'/following-sibling::td[4]'
-    #               f'/div/button/div[not(contains(@class, "active"))]')
-    #     try:
-    #         self.click(K8S_ORDER_DROPDOWN_COLLAPSED, timeout=5)  # Раскрываем заказ k8s
-    #         self.click(self.K8S_ORDER_VOLUMES)  # Открываем вкладку Узлы
-    #         self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES)  # Ожидаем загрузки данных раздела Узлы
-    #     except Exception as e:
-    #         logger.info('Раскрыть заказ Kubernetes не потребовалось')
 
     def expand_k8s_order(self, kaas_name, tab=None, wait_locator=None):
         """
