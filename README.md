@@ -42,5 +42,5 @@ sudo dpkg -i ./allure*.deb
 ```bash
 pytest ./tests/dns_test.py
 pytest --count=10 ./tests/dns_test.py  # запустить тест 10 раз
-pytest ./tests/kuber_test.py
+pytest ./tests/kaas_test.py
 ```

@@ -38,43 +38,44 @@ def test_x(pre_post_browser, browser):
             name=step_name,
             attachment_type=AttachmentType.PNG
         )
-    order_num = '134848'
+    order_num = '135176'
 
-    # step_name = f'Заказ услуги kubernetes из витрины'
-    # with allure.step(step_name):
-    #     logger.info('Шаг: ' + step_name)
-    #     auth_page.auth_as_client()
-    #     _, kaas_name = kuber_service.make_k8s_order()
-    #     allure.attach(
-    #         body=auth_page.browser.get_screenshot_as_png(),
-    #         name='Страница созданного заказа',
-    #         attachment_type=AttachmentType.PNG
-    #     )
-    kaas_name = 'Кластер Kubernetes 01.06.2025, 18:30:35'
-
-    step_name = f'Операции с имеющимся заказом Kubernetes'
-    ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
-                                   f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
-    ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
-                              f'//following-sibling::td[2]'
-                              f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
-    # с созданным заказом k8s
+    step_name = f'Заказ услуги kubernetes из витрины'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
-        order_page.find_order(order_num)
-        MENU_CONTAINERS = (By.XPATH, '//span[contains(text(), "Контейнеры")]')
-        MENU_CONTAINERS_K8S = (By.XPATH, '//button[contains(text(), "Kubernetes как сервис")]')
-        order_page.click(MENU_CONTAINERS)
-        order_page.click(MENU_CONTAINERS_K8S)
-        order_page.text_check(ORDER_STATUS_TEXT,
-                              'Работает',
-                              refresh_timeout=60,
-                              hover_element=ORDER_STATUS)
+        auth_page.auth_as_client()
+        _, kaas_name = kuber_service.make_k8s_order()
         allure.attach(
-            body=kuber_service.browser.get_screenshot_as_png(),
-            name='Созданный заказ Kubernetes',
+            body=auth_page.browser.get_screenshot_as_png(),
+            name='Страница созданного заказа',
             attachment_type=AttachmentType.PNG
         )
+    # kaas_name = 'Кластер Kubernetes 03.06.2025, 19:03:07'
+
+    # step_name = f'Открываем имеющийся заказ Kubernetes'
+    # ORDER_STATUS_TEXT = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+    #                                f'/following-sibling::td[2]//p[@class="icon-hint__text"]')
+    # ORDER_STATUS = (By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
+    #                           f'//following-sibling::td[2]'
+    #                           f'//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
+    # # с созданным заказом k8s
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     order_page.find_order(order_num)
+    #     MENU_CONTAINERS = (By.XPATH, '//span[contains(text(), "Контейнеры")]')
+    #     MENU_CONTAINERS_K8S = (By.XPATH, '//button[contains(text(), "Kubernetes как сервис")]')
+    #     order_page.click(MENU_CONTAINERS)
+    #     order_page.click(MENU_CONTAINERS_K8S)
+    #     kuber_service.expand_k8s_order(kaas_name)
+    #     order_page.text_check(ORDER_STATUS_TEXT,
+    #                           'Работает',
+    #                           refresh_timeout=60,
+    #                           hover_element=ORDER_STATUS)
+    #     allure.attach(
+    #         body=kuber_service.browser.get_screenshot_as_png(),
+    #         name='Созданный заказ Kubernetes',
+    #         attachment_type=AttachmentType.PNG
+    #     )
 
     step_name = f'Проверка вкладки Информация'
     with allure.step(step_name):
@@ -111,5 +112,3 @@ def test_x(pre_post_browser, browser):
             name='Удаленный заказ',
             attachment_type=AttachmentType.PNG
         )
-
-
