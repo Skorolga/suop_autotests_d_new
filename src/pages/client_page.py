@@ -19,7 +19,12 @@ class ClientPage(BasicPage):
     # Локаторы заказа за клиента
     FORM_TITLE_CONF = (By.XPATH, '//h3[contains(text(), "Конфигурация")]')  # Для проверки загрузки страницы с формой заказа iaas
     RADIOBUTTON_NEW_ORDER = (By.XPATH, '//div[contains(text(), "Создать новый заказ")]')  # Радиобаттон создать iaas в новом заказе
-    COST_WITHOUT_TAX = (By.XPATH, '//div[@class="costs-value"]')
+    DAY_COST = (By.XPATH, '//p[contains(text(), "В сутки без НДС")]'
+                                  '/ancestor::div/div[@class="costs-icon"]'
+                                  '/div[@class="costs-value"]')  # Цена за сутки
+    MONTH_COST = (By.XPATH, '//p[contains(text(), "В месяц без НДС")]'
+                                  '/ancestor::div/div[@class="costs-icon"]'
+                                  '/div[@class="costs-value"]')  # Цена за месяц
     SUBMIT_BUTTON = (By.XPATH, '//button[@type="submit"]')  # Кнопка заказать
     NEW_ORDER_NUM = (By.XPATH, '//p[contains(text(), "№")]')  # Локатор модального окна с номером созданного заказа
     PARENT_ORDER_NUM = (By.XPATH, '//span[contains(text(), "Заказ №")]')  # Локатор для получения номера родительского заказа
@@ -40,9 +45,9 @@ class ClientPage(BasicPage):
         self.wait_for_page_loaded(self.FORM_TITLE_CONF)
         self.click(self.RADIOBUTTON_NEW_ORDER)  # Радиокнопка для создания iaas в новом заказе
         # проверяем начисление
-        cost = self.check_cost(self.COST_WITHOUT_TAX)
+        cost = self.check_cost(self.DAY_COST)
         logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
-        assert cost, f'Ошибка в начислении суммы заказа по локатору {self.COST_WITHOUT_TAX}'
+        assert cost, f'Ошибка в начислении суммы заказа по локатору {self.DAY_COST}'
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Страница с формой для создания заказа',
@@ -91,7 +96,7 @@ class ClientPage(BasicPage):
         )
         return parent_order_name
 
-    def check_cost(self, cost_locator, timeout=30) -> float|bool:
+    def check_cost(self, cost_locator, timeout=30) -> float | bool:
         """Проверяет наличие суммы > 0 по локатору"""
         start_time = datetime.now()
         while True:
@@ -101,12 +106,12 @@ class ClientPage(BasicPage):
                 logger.error('timeout при поиске и проверке начисления стоимости заказа без НДС')
                 return False
             try:
-                order_cost_without_tax = self.find_elem(cost_locator).text
-                order_cost_without_tax = ''.join([i for i in order_cost_without_tax if i.isdigit() or i == '.'])  # Убираем лишние знаки для конвертации str -> float
-                order_cost_without_tax = float(order_cost_without_tax.strip())
-                # logger.info(order_cost_without_tax)
-                if order_cost_without_tax > 0:
-                    return order_cost_without_tax
+                cost = self.find_elem(cost_locator).text
+                cost = ''.join([i for i in cost if i.isdigit() or i == '.'])  # Убираем лишнее для конвертации в float
+                cost = float(cost.strip())
+                # logger.info(cost)
+                if cost > 0:
+                    return cost
             except Exception as e:
                 # logger.warning(f'Ошибка в методе check_cost: {e}')
                 continue
