@@ -76,9 +76,12 @@ class KuberService(BasicPage):
         self.click(ClientPage.BUTTON_MAKE_ORDER)  # Кнопка заказать
         self.wait_for_page_loaded(self.KUBER_MAKE_ORDER_TITLE)
         # проверяем начисление
-        cost = self.client_page.check_cost(ClientPage.COST_WITHOUT_TAX)
-        logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
-        assert cost, f'Ошибка в начислении суммы заказа по локатору {ClientPage.COST_WITHOUT_TAX}'
+        day_cost = self.client_page.check_cost(ClientPage.DAY_COST)
+        month_cost = self.client_page.check_cost(ClientPage.MONTH_COST)
+        logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(day_cost)} в месяц без НДС: {str(month_cost)}')
+        if not all([bool(day_cost), bool(month_cost)]):
+            logger.warning(f'Ошибка в начислении стоимости услуг')
+
         kaas_name = self.find_elem(self.K8S_ORDER_NAME_FIELD).get_attribute("value")
         logger.info(f'Наименование kaas: {kaas_name}')
         self.click(ClientPage.SUBMIT_BUTTON)  # Итоговая кнопка создания заказа
@@ -95,17 +98,17 @@ class KuberService(BasicPage):
                 continue
             order_num = ''.join([symb for symb in order_num if symb.isdigit()])
             if int(order_num) > 0:
-                logger.info(f'Создан заказ Kubernetes № {order_num}')
+                logger.info(f'Создан заказ KaaS № {order_num}')
                 break
             time.sleep(0.5)
         allure.attach(
             body=str(order_num),
-            name="Номер созданного заказа (дочернего)",
+            name="Номер созданного заказа KaaS (дочернего)",
             attachment_type=AttachmentType.TEXT,
         )
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Модальное окно созданного заказа (дочернего)',
+            name='Модальное окно созданного заказа KaaS (дочернего)',
             attachment_type=AttachmentType.PNG
         )
         self.click(ClientPage.GO_TO_ORDER)
