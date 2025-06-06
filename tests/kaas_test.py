@@ -80,7 +80,7 @@ def test_kuber(pre_post_browser, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.auth_as_client()
-        _, kaas_name = kuber_service.make_k8s_order()
+        _, kaas_name = kuber_service.make_k8s_order(parent_order=order_num)
         allure.attach(
             body=kuber_service.browser.get_screenshot_as_png(),
             name='Страница созданного заказа',

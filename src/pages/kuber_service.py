@@ -25,6 +25,7 @@ class KuberService(BasicPage):
         self.auth_page = AuthPage(browser)
 
     KUBER_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
+    K8S_MAKE_ORDER_PARENT_ORDER_INPUT = (By.XPATH, '//label[text()="Выберите заказ"]/ancestor::div[1]/preceding-sibling::div')
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
     ORDER_STATUS_TEXT = (By.XPATH, '//div[@class="suborder-state-status"]//p[@class="icon-hint__text"]')
     # K8S_ORDER_DROPDOWN = (By.XPATH, '//table//tbody/tr//td[5]')  # Раскрыть заказ kubernetes
@@ -67,18 +68,20 @@ class KuberService(BasicPage):
     K8S_ORDER_VOLUMES_DEL = (By.XPATH, '//td//*[contains(text(), "Файловый")]'
                                        '//ancestor::td[1]/following-sibling::td[4]')  # Кнопка удаления тома
 
-
-    def make_k8s_order(self, timeout=360) -> bool | tuple[str, str]:
+    def make_k8s_order(self, parent_order=None, timeout=360) -> bool | tuple[str, str]:
         """Создает заказ kubernetes"""
         logger.info('Создание заказа kubernetes')
         self.click(ClientPage.MENU_MAKE_ORDER)  # Верхнее меню
         self.click(ClientPage.BANNER_MAKE_KUBER_ORDER)  # Карточка с услугой kubernetes
         self.click(ClientPage.BUTTON_MAKE_ORDER)  # Кнопка заказать
         self.wait_for_page_loaded(self.KUBER_MAKE_ORDER_TITLE)
+        if parent_order:
+            self.click(self.K8S_MAKE_ORDER_PARENT_ORDER_INPUT)
+            self.click((By.XPATH, f'//label[text()="Выберите заказ"]/ancestor::div[1]/ancestor::div[1]//div[contains(text(), "{parent_order}")]'))
         # проверяем начисление
         day_cost = self.client_page.check_cost(ClientPage.DAY_COST)
         month_cost = self.client_page.check_cost(ClientPage.MONTH_COST)
-        logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(day_cost)} в месяц без НДС: {str(month_cost)}')
+        logger.info(f'Начисленная стоимость за заказ KaaS в сутки: {str(day_cost)} в месяц: {str(month_cost)}')
         if not all([bool(day_cost), bool(month_cost)]):
             logger.warning(f'Ошибка в начислении стоимости услуг')
 
@@ -200,7 +203,7 @@ class KuberService(BasicPage):
         # Удаление созданного узла
         logger.info(f'Удаление созданной группы узлов Kubernetes {node_name}')
         DEL_NODE_LOCATOR = (By.XPATH, f'//td[./div/p[contains(text(), "{node_name}")]]'
-                              '//following-sibling::td[6]')
+                                      f'//following-sibling::td[6]')
         self.click(DEL_NODE_LOCATOR)
         self.click(self.K8S_ORDER_NODES_ADD_NODES_DEL_BUTTON)
         self.order_page.text_check(ORDER_STATUS_TEXT,
@@ -220,7 +223,7 @@ class KuberService(BasicPage):
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Удаленная группа узлов',
+            name='Раздел группа узлов после удаления',
             attachment_type=AttachmentType.PNG
         )
         time.sleep(10)  # ждем завершения анимации удаления узлов
@@ -276,7 +279,7 @@ class KuberService(BasicPage):
             logger.info('Созданное правило успешно удалено')
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Удаленное правило',
+            name='Раздел Сеть после удаления правила',
             attachment_type=AttachmentType.PNG
         )
 
@@ -344,7 +347,7 @@ class KuberService(BasicPage):
                 self.K8S_ORDER_VOLUMES_ADDED_VOLUME))  # Ждем когда элемент исчезнет
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
-            name='Удаленный том',
+            name='Раздел тома после удаления',
             attachment_type=AttachmentType.PNG
         )
 
