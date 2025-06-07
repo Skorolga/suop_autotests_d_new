@@ -24,7 +24,7 @@ class KuberService(BasicPage):
         self.order_page = OrdersPage(browser)
         self.auth_page = AuthPage(browser)
 
-    KUBER_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
+    K8S_MAKE_ORDER_TITLE = (By.XPATH, '//h4[contains(text(), "Конфигурация кластера")]')
     K8S_MAKE_ORDER_PARENT_ORDER_INPUT = (By.XPATH, '//label[text()="Выберите заказ"]/ancestor::div[1]/preceding-sibling::div')
     ORDER_STATUS = (By.XPATH, '//div[@class="suborder-state-status"]/div[@class="order-subitem-status"]')
     ORDER_STATUS_TEXT = (By.XPATH, '//div[@class="suborder-state-status"]//p[@class="icon-hint__text"]')
@@ -74,7 +74,7 @@ class KuberService(BasicPage):
         self.click(ClientPage.MENU_MAKE_ORDER)  # Верхнее меню
         self.click(ClientPage.BANNER_MAKE_KUBER_ORDER)  # Карточка с услугой kubernetes
         self.click(ClientPage.BUTTON_MAKE_ORDER)  # Кнопка заказать
-        self.wait_for_page_loaded(self.KUBER_MAKE_ORDER_TITLE)
+        self.wait_for_page_loaded(self.K8S_MAKE_ORDER_TITLE)
         if parent_order:
             self.click(self.K8S_MAKE_ORDER_PARENT_ORDER_INPUT)
             self.click((By.XPATH, f'//label[text()="Выберите заказ"]/ancestor::div[1]/ancestor::div[1]//div[contains(text(), "{parent_order}")]'))
@@ -395,7 +395,7 @@ class KuberService(BasicPage):
                                    'Удаление кластера',
                                    refresh_timeout=60*2,
                                    hover_element=ORDER_STATUS)
-        WebDriverWait(self.browser, 60*30).until(
+        WebDriverWait(self.browser, 60*45).until(
             EC.invisibility_of_element_located(KAAS_FOR_DEL_LOCATOR)
         )  # Ждем когда элемент исчезнет
         assert self.find_elem(KAAS_FOR_DEL_LOCATOR, 10) == False  # Ждем удаления

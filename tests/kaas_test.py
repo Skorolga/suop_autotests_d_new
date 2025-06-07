@@ -1,14 +1,19 @@
 import allure
 from allure_commons.types import AttachmentType
+import pytest
 from src.logger.formatted_logger import logger
 from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
-from src.pages.kuber_service import KuberService
+from src.pages.k8s_service import KuberService
 from config.config import SUOP
 
-def test_kuber(pre_post_browser, browser):
+@allure.tag('KaaS')
+@allure.testcase('https://tasks.rt-dc.ru/secure/Tests.jspa#/testCase/CLOUDDEV-T911')
+@allure.story('Создание, редактирование и удаление Kubernetes под ролью клиента')
+@pytest.mark.suop
+def test_kaas(pre_post_browser, browser):
     """Тест услуги kubernetes"""
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = AuthPage(browser)
