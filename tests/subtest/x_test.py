@@ -6,7 +6,7 @@ from src.pages.main_page import MainPage
 from src.pages.auth_page import AuthPage
 from src.pages.client_page import ClientPage
 from src.pages.orders_page import OrdersPage
-from src.pages.kuber_service import KuberService
+from src.pages.k8s_service import KuberService
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 from selenium.webdriver.common.by import By

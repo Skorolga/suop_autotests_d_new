@@ -36,11 +36,12 @@ sudo dpkg -i ./allure*.deb
 ```
 
 # Файл окружения
-В корневом каталоге проекта создать файл .env на основе .env.example
+В корневом каталоге проекта создать файл окружения .env на основе .env.example
 
 # Запуск тестов
 ```bash
 pytest ./tests/dns_test.py
-pytest --count=10 ./tests/dns_test.py  # запустить тест 10 раз
 pytest ./tests/kaas_test.py
+pytest --count=10 ./tests/dns_test.py  # Запустить тест 10 раз
+pytest -m suop  # Запустить все тесты с тегом suop (DNS, KaaS)
 ```

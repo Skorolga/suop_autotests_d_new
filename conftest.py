@@ -33,12 +33,7 @@ def browser():
 @pytest.fixture
 def pre_post_browser(browser):
     yield
-    browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
-
-@allure.tag('dns')
-@allure.testcase('https://ejira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
-@allure.story('Управление DNS. Добавление домена.')
-@pytest.mark.dns
+    browser.get(SUOP.MAIN_URL + '/logout')  # логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-
+import pytest
 import allure
 from allure_commons.types import AttachmentType
 from src.pages.main_page import MainPage
@@ -11,7 +11,10 @@ from src.pages.DNS_service import DnsPage
 from config.config import SUOP
 from src.logger.formatted_logger import logger
 
-
+@allure.tag('dns')
+@allure.testcase('https://ejira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
+@allure.story('Управление DNS. Добавление домена.')
+@pytest.mark.suop
 def test_dns(pre_post_browser, browser):
     """Тест DNS СУ ОП"""
 
