@@ -11,7 +11,7 @@ class ClientPage(BasicPage):
     """Класс описывает страницу клиента"""
 
     MENU_MAKE_ORDER = (By.XPATH, '//span[contains(text(), "Заказать услугу")]')
-    BANNER_MAKE_ORDER = (By.XPATH, '//a[@href="/showcase/services/iaas"]')
+    BANNER_MAKE_ORDER = (By.XPATH, '//div/div/a[@href="/showcase/services/iaas"]')
     BANNER_MAKE_KUBER_ORDER = (By.XPATH, '//div[@class="service-card-container"]//a[@href="/showcase/services/kaas"]')
     BUTTON_MAKE_ORDER = (By.XPATH, '//button[contains(text(), "Заказать")]')
     TABLE_WITH_ORDERS_IN_LK = (By.XPATH, '//div[contains(@class, "items-table__dropdown")]')  # Проверка загрузки стр. с заказами
