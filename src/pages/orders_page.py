@@ -84,6 +84,7 @@ class OrdersPage(BasicPage):
         logger.info('Согласование заказа')
         self.click(self.ORDER_BUTTON_APPROVE_MANAGER)
         self.click(self.ORDER_BUTTON_APPROVE_MANAGER_2)
+        self.browser.refresh()  # в 12.1.0 пропало обновление статуса заказов после зажатия
         self.text_check(self.ORDER_STATUS, 'Изменение объема ресурсов')
         self.text_check(self.ORDER_STATUS, 'Работает')
         logger.info('Ожидание состояние "Работает" у дочерних заказов')
