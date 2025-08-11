@@ -148,9 +148,7 @@ class KuberService(BasicPage):
         time.sleep(5)
         self.browser.refresh()
         # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order(kaas_name,
-                              tab=self.K8S_ORDER_NODES,
-                              wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
+        self.click(self.K8S_ORDER_NODES)  # открываем вкладку Узлы
         self.wait_for_page_loaded(self.K8S_ORDER_NODES_MASTER_DATA)
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
@@ -182,16 +180,10 @@ class KuberService(BasicPage):
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
                                    hover_element=ORDER_STATUS)
-        self.expand_k8s_order(kaas_name,
-                              tab=self.K8S_ORDER_NODES,
-                              wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
         self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
                                    hover_element=ORDER_STATUS)
-        self.expand_k8s_order(kaas_name,
-                              tab=self.K8S_ORDER_NODES,
-                              wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
         self.wait_for_page_loaded((By.XPATH, f'//p[text()="{node_name}"]'))  # Ждем появления созданного узла
         assert self.find_elem((By.XPATH, f'//p[text()="{node_name}"]')), f'Группа узлов Kubernetes не найдена'
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
@@ -210,16 +202,11 @@ class KuberService(BasicPage):
                                    'Изменение ресурсов',
                                    refresh_timeout=60 * 3,
                                    hover_element=ORDER_STATUS)
-        self.expand_k8s_order(kaas_name,
-                              tab=self.K8S_ORDER_NODES,
-                              wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
         self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Работает',
                                    refresh_timeout=60 * 3,
                                    hover_element=ORDER_STATUS)
-        self.expand_k8s_order(kaas_name,
-                              tab=self.K8S_ORDER_NODES,
-                              wait_locator=self.K8S_ORDER_NODES_MASTER_DATA)  # Открываем вкладку Узлы
+
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
@@ -269,7 +256,7 @@ class KuberService(BasicPage):
         self.click(self.K8S_ORDER_NET_DEL_RULE)
         self.click(self.K8S_ORDER_NET_DEL_RULE_MODAL_YES)
         WebDriverWait(self.browser, 60).until(
-            EC.invisibility_of_element(OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда Ждем когда иконка ожидания исчезнет
+            EC.invisibility_of_element(OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда иконка ожидания исчезнет
         WebDriverWait(self.browser, 60).until(
             EC.invisibility_of_element(
                 self.K8S_ORDER_NET_ADDED_RULE))  # Ждем когда правило Сети исчезнет
@@ -295,7 +282,7 @@ class KuberService(BasicPage):
         time.sleep(5)
         self.browser.refresh()  # Баг с правами, нужна доп. перезагрузка
         # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order(kaas_name, tab=self.K8S_ORDER_VOLUMES, wait_locator=self.K8S_ORDER_VOLUMES)
+        self.click(self.K8S_ORDER_VOLUMES)  # Открываем вкладку Постоянные тома
         self.wait_for_page_loaded(self.K8S_ORDER_VOLUMES_TABLE_DATA)
         self.scroll_to_element(self.find_elem(K8S_ORDER_DROPDOWN))
         allure.attach(
@@ -323,7 +310,6 @@ class KuberService(BasicPage):
                                    refresh_timeout=60 * 10,
                                    hover_element=ORDER_STATUS)
         # self.wait_for_page_loaded(K8S_ORDER_DROPDOWN)
-        self.expand_k8s_order(kaas_name, tab=self.K8S_ORDER_VOLUMES, wait_locator=self.K8S_ORDER_VOLUMES)
         allure.attach(
             body=self.browser.get_screenshot_as_png(),
             name='Добавленный том',
@@ -360,7 +346,7 @@ class KuberService(BasicPage):
         :param wait_locator: локатор для ожидания загрузки
         :return: None
         """
-
+        # локатор для свернутого заказа
         K8S_ORDER_DROPDOWN_COLLAPSED = (
         By.XPATH, f'//p[text()="{kaas_name}"]/ancestor::td[1]'
                   f'/following-sibling::td[4]'
@@ -373,7 +359,7 @@ class KuberService(BasicPage):
             if wait_locator:
                 self.wait_for_page_loaded(wait_locator)  # Ожидаем загрузки данных
         except Exception as e:
-            logger.info('Раскрыть заказ Kubernetes не потребовалось')
+            logger.info(f'Раскрыть заказ Kubernetes не потребовалось: {e}')
 
     def del_k8s_order(self, kaas_name):
         """Удаление дочернего заказа Kubernetes"""
