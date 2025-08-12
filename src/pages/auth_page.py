@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from src.logger.formatted_logger import logger
 from src.pages.basic_page import BasicPage
 from src.pages.main_page import MainPage
+from src.pages.client_page import ClientPage
 from config.config import SUOP
 
 
@@ -74,6 +75,7 @@ class AuthPage(BasicPage):
             self.click(self.MENU_CHANGE_ROLE)
         self.select_role(SUOP.ORGANIZATION_ADMIN)
         self.wait_for_page_loaded(self.PROFILE_NAME_ADMIN)
+        self.wait_for_page_loaded(ClientPage.TABLE_WITH_ORDERS_IN_LK)
         time.sleep(3)
 
     def relogin_as_manager(self, first_auth=False):
