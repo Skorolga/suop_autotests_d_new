@@ -75,7 +75,6 @@ def test_iaas(pre_post_browser, browser):
             attachment_type=AttachmentType.PNG
         )
 
-
     step_name = f'Удаление родительского заказа {order_num}'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)

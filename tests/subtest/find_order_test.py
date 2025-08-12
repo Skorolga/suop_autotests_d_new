@@ -14,10 +14,9 @@ def pre_post_dns(browser):
     yield
     browser.get(SUOP.MAIN_URL + '/logout')  # TODO логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
 
-@allure.testcase('https://jira.rt-dc.ru/secure/Tests.jspa#/v2/testCases')
-@allure.story('Управление DNS. Удаление.')
-def test_del(pre_post_dns, browser):
-    """Тест DNS СУ ОП"""
+@allure.story('Поиск заказа')
+def test_find_order(pre_post_dns, browser):
+    """Поиск заказа через форму"""
 
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = AuthPage(browser)
@@ -41,7 +40,7 @@ def test_del(pre_post_dns, browser):
             name='Личный_кабинет_клиента',
             attachment_type=AttachmentType.PNG
         )
-    order_num1 = '126794'
+    order_num1 = '140319'
 
     step_name = 'Поиск заказа за клиента'
     with allure.step(step_name):
