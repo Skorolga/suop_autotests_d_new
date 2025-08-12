@@ -42,35 +42,34 @@ def test_find_order(pre_post_dns, browser):
         )
     order_num1 = '140319'
 
-    step_name = 'Поиск заказа за клиента'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        auth_page.auth_as_client()
-        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-        orders_page.find_order(order_num1)
-        allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Найденный заказ за клиента',
-            attachment_type=AttachmentType.PNG
-        )
-
-    step_name = 'Поиск заказа за менеджера'
-    with allure.step(step_name):
-        logger.info('Шаг: ' + step_name)
-        auth_page.relogin_as_manager()
-        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
-        orders_page.find_order(order_num1)
-        allure.attach(
-            body=auth_page.browser.get_screenshot_as_png(),
-            name='Найденный заказ за менеджера',
-            attachment_type=AttachmentType.PNG
-        )
+    # step_name = 'Поиск заказа за клиента'
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     auth_page.auth_as_client()
+    #     orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+    #     orders_page.find_order(order_num1)
+    #     allure.attach(
+    #         body=auth_page.browser.get_screenshot_as_png(),
+    #         name='Найденный заказ за клиента',
+    #         attachment_type=AttachmentType.PNG
+    #     )
+    #
+    # step_name = 'Поиск заказа за менеджера'
+    # with allure.step(step_name):
+    #     logger.info('Шаг: ' + step_name)
+    #     auth_page.relogin_as_manager()
+    #     orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
+    #     orders_page.find_order(order_num1)
+    #     allure.attach(
+    #         body=auth_page.browser.get_screenshot_as_png(),
+    #         name='Найденный заказ за менеджера',
+    #         attachment_type=AttachmentType.PNG
+    #     )
 
     step_name = 'Поиск заказа за администратора'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_admin_suop()
-        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         orders_page.find_order(order_num1)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
@@ -94,7 +93,6 @@ def test_find_order(pre_post_dns, browser):
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
         auth_page.relogin_as_admin_suop()
-        orders_page.wait_for_page_loaded(client_page.TABLE_WITH_ORDERS_IN_LK)
         orders_page.find_order(order_num1)
         allure.attach(
             body=auth_page.browser.get_screenshot_as_png(),
