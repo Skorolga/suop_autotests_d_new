@@ -9,7 +9,7 @@ from src.pages.k8s_service import KuberService
 from config.config import SUOP
 
 def test_kuber(pre_post_browser, browser):
-    """Смоук тест услуги kubernetes"""
+    """Smoke тест услуги kubernetes"""
     main_page = MainPage(browser)  # экземпляр главной страницы с url
     auth_page = AuthPage(browser)
     client_page = ClientPage(browser)

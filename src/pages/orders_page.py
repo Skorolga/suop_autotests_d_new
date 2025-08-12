@@ -56,7 +56,7 @@ class OrdersPage(BasicPage):
         Под клиентом, через поиск заказ нужно дополнительно открывать в отличие от админа и менеджера
         """
 
-        if self.wait_for_page_loaded(self.FILTER_CLEAN_BUTTON, 3):
+        if self.wait_for_page_loaded(self.FILTER_CLEAN_BUTTON, 5):
             self.click(self.FILTER_CLEAN_BUTTON)  # Сброс фильтров для поиска заказов (если он есть)
         WebDriverWait(self.browser, 30).until(EC.invisibility_of_element(self.FILTER_CLEAN_BUTTON))  # Ждем когда элемент исчезнет
         # time.sleep(2)

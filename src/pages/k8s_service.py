@@ -384,7 +384,7 @@ class KuberService(BasicPage):
         WebDriverWait(self.browser, 60*45).until(
             EC.invisibility_of_element_located(KAAS_FOR_DEL_LOCATOR)
         )  # Ждем когда элемент исчезнет
-        assert self.find_elem(KAAS_FOR_DEL_LOCATOR, 10) == False  # Ждем удаления
+        assert self.find_elem(KAAS_FOR_DEL_LOCATOR, 15) == False  # Ждем удаления
 
     def make_locator_kaas(self, kaas_name) -> tuple[str, str]:
         """Возвращает локатор заказа kaas"""
