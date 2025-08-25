@@ -45,7 +45,7 @@ class ClientPage(BasicPage):
         self.click(self.BUTTON_MAKE_ORDER)
         self.wait_for_page_loaded(self.FORM_TITLE_CONF)
         self.click(self.RADIOBUTTON_NEW_ORDER)  # Радиокнопка для создания iaas в новом заказе
-        self.click(self.CHECKBOX_TEXT_PARAM)
+        # self.click(self.CHECKBOX_TEXT_PARAM)
         # проверяем начисление
         cost = self.check_cost(self.DAY_COST)
         logger.info(f'Начисленная стоимость за заказ "Виртуальная инфраструктура" в сутки без НДС: {str(cost)}')
