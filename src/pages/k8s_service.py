@@ -315,6 +315,7 @@ class KuberService(BasicPage):
             name='Добавленный том',
             attachment_type=AttachmentType.PNG
         )
+        time.sleep(3)  # добавили ожидание для исключения ошибки по просьбе команды KaaS
         # Удаление тома
         logger.info('Удаление добавленного тома')
         self.click(self.K8S_ORDER_VOLUMES_DEL)
@@ -322,6 +323,7 @@ class KuberService(BasicPage):
         # WebDriverWait(self.browser, 60).until(
         #     EC.invisibility_of_element(
         #         OrdersPage.RIGHTS_FOR_CHANGE_RESOURCES_LOADER_ICON))  # Ждем когда иконка ожидания исчезнет
+
         self.order_page.text_check(ORDER_STATUS_TEXT,
                                    'Удаление хранилища',
                                    hover_element=ORDER_STATUS)

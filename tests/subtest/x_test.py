@@ -38,7 +38,7 @@ def test_x(pre_post_browser, browser):
             name=step_name,
             attachment_type=AttachmentType.PNG
         )
-    order_num = '140202'
+    order_num = '140796'
 
     step_name = f'Заказ услуги kubernetes из витрины'
     # with allure.step(step_name):
