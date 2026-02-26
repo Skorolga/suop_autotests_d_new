@@ -15,6 +15,8 @@ class MainPage(BasicPage):
             self.browser.get(url)
 
     def go_to(self, set_url):
+        # Navigate to URL with embedded credentials
+        # Chrome should handle basic auth transparently
         self.browser.get(set_url)
 
     def auth_main_page(self):

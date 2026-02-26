@@ -18,7 +18,17 @@ def test_iaas(pre_post_browser, browser):
     step_name = 'Открываем главную страницу'
     with allure.step(step_name):
         logger.info('Шаг: ' + step_name)
+        # переходим на URL со встроенными учетными данными (Chrome теперь должен пропускать их)
         main_page.go_to(SUOP.MAIN_URL)
+        # добавляем скриншот сразу после навигации для отладки (используем безопасный метод)
+        try:
+            allure.attach(
+                body=main_page.get_screenshot_safe(),
+                name='Main_page_initial',
+                attachment_type=AttachmentType.PNG
+            )
+        except:
+            pass  # Skip screenshot if it fails
         main_page.wait_for_page_loaded(main_page.SHOWCASE_CARD)
 
     step_name = 'Личный кабинет клиента'

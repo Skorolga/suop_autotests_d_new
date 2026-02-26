@@ -8,6 +8,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from src.logger.formatted_logger import logger
+from config.config import SUOP
+from pywinauto.keyboard import send_keys
+from pywinauto import Application
 
 
 class BasicPage(object):
@@ -88,6 +91,17 @@ class BasicPage(object):
                 return True
             except TimeoutException:
                 logger.warning(f'Вышло время ожидания загрузки страницы по элементу: {locator} в функции basic_page.wait_for_page_loaded()')
+                # при ошибке делаем скрин и сохраняем исходник для отладки
+                try:
+                    filename = "wait_for_page_loaded_failure"
+                    self.browser.save_screenshot(f"{filename}.png")
+                    logger.info(f"Скриншот страницы сохранен в {filename}.png")
+                    page_source = self.browser.page_source
+                    with open(f"{filename}.html", "w", encoding="utf-8") as f:
+                        f.write(page_source)
+                    logger.info(f"Исходник страницы сохранен в {filename}.html")
+                except Exception as e:
+                    logger.warning(f"Не удалось сохранить артефакты страницы: {e}")
                 return False
 
     def save_scr(self, file_name:str):
@@ -96,9 +110,41 @@ class BasicPage(object):
         if self.page_has_loaded():
             self.browser.save_screenshot(f'{file_name}.png')
 
+    def get_screenshot_safe(self):
+        """Get screenshot, dismissing any alerts that appear"""
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                return self.browser.get_screenshot_as_png()
+            except Exception as alert_error:
+                if 'UnexpectedAlertPresentException' in str(type(alert_error)) or 'Alert' in str(alert_error):
+                    try:
+                        alert = self.browser.switch_to.alert
+                        alert.dismiss()
+                        logger.info(f'Alert dismissed during screenshot (attempt {attempt + 1})')
+                    except:
+                        pass  # No alert to dismiss
+                    if attempt == max_attempts - 1:
+                        raise
+                else:
+                    raise
+
     def type(self, locator, text):
         """Набирает тест"""
         self.browser.find_element(*locator).send_keys(text)
+
+    def handle_basic_auth(self, login: str | None = None, password: str | None = None, timeout: int = 5):
+        """Обработка диалога базовой автентификации.
+        
+        Для Firefox: диалог открывается. Мы кликаем OK чтобы Firefox использовал
+        встроенные в URL учетные данные (https://user:pass@host).
+        """
+        try:
+            alert = WebDriverWait(self.browser, timeout).until(EC.alert_is_present())
+            alert.accept()  # кликаем OK для использования встроенных в URL учетных данных
+            logger.info('Basic auth dialog accepted')
+        except Exception:
+            pass  # если нет никакого алерта
 
     def get_text(self, locator):
         elem = self.find_elem(locator)

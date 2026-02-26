@@ -1,17 +1,27 @@
 from dotenv import load_dotenv
 from pathlib import Path
 import os
-
+from urllib.parse import quote
 
 dotenv_path = Path('./.env')
 load_dotenv(dotenv_path=dotenv_path, override=True)
 
-
 class SUOP:
-    BASE_URL = os.getenv('BASE_URL').split('//')
-    BASIC_AUTH_LOGIN = os.getenv('BASIC_AUTH_LOGIN')
-    BASIC_AUTH_PASSWORD = os.getenv('BASIC_AUTH_PASSWORD')
-    MAIN_URL = f'{BASE_URL[0]}//{BASIC_AUTH_LOGIN}:{BASIC_AUTH_PASSWORD}@{BASE_URL[1]}'
+    BASE_URL = os.getenv('BASE_URL', 'https://tnop12.rt.ru')
+    BASIC_AUTH_LOGIN = os.getenv('BASIC_AUTH_LOGIN', 'tnop')
+    BASIC_AUTH_PASSWORD = os.getenv('BASIC_AUTH_PASSWORD', 'TZjLZ~uOx1~0EG~')
+    
+    # Кодируем пароль для URL
+    ENCODED_PASSWORD = quote(BASIC_AUTH_PASSWORD)
+    
+    # Собираем URL с аутентификацией
+    if '://' in BASE_URL:
+        protocol, rest = BASE_URL.split('://', 1)
+        MAIN_URL = f'{protocol}://{BASIC_AUTH_LOGIN}:{ENCODED_PASSWORD}@{rest}'
+    else:
+        MAIN_URL = f'https://{BASIC_AUTH_LOGIN}:{ENCODED_PASSWORD}@{BASE_URL}'
+    
+    # Остальные переменные
     CLIENT_LOGIN = os.getenv('CLIENT_LOGIN')
     CLIENT_PASSWORD = os.getenv('CLIENT_PASSWORD')
     ORGANIZATION_CLIENT = os.getenv('ORGANIZATION_CLIENT')
