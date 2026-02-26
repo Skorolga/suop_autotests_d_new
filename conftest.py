@@ -4,27 +4,30 @@ import subprocess
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 import allure
 from config.config import SUOP
+# webdriver-manager helps install the correct chromedriver
+from webdriver_manager.chrome import ChromeDriverManager
 
 @pytest.fixture(scope="session")
 def browser():
     options = Options()
-    options.add_argument("--ignore-ssl-errors=yes")
-    options.add_argument("--disable-notifications")
-    options.add_argument("--ignore-certificate-errors")
-    options.add_argument("--start-maximized")
-    options.add_argument("--lang=ru-RU")
-    options.add_experimental_option('prefs', {'intl.accept_languages': 'ru,ru_RU'})
-    # options.add_argument("--disable-application-cache")
-    options.add_argument("--incognito")
-
-    # options.add_argument("--disk-cache-size=0")
-    options.set_capability('unhandledPromptBehavior', 'ignore')
+    # Настройки Chrome для работы с Basic Auth
+    prefs = {
+        'profile.default_content_settings.popups': 0,
+        'profile.managed_default_content_settings.notifications': 2,
+    }
+    options.add_experimental_option('prefs', prefs)
+    options.add_argument('--disable-blink-features=BlockCredentialedSubresources')
+    options.add_argument('--disable-web-resources-deprecation-warnings')
+    
     if platform == 'linux':
         options.add_argument('--headless')
 
-    browser = webdriver.Chrome(options=options)
+    # install and start chromedriver via webdriver-manager
+    service = Service(ChromeDriverManager().install())
+    browser = webdriver.Chrome(service=service, options=options)
     # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным использовать не рекомендуется)
 
     yield browser
@@ -33,7 +36,8 @@ def browser():
 @pytest.fixture
 def pre_post_browser(browser):
     yield
-    browser.get(SUOP.MAIN_URL + '/logout')  # логаут по URL, т.к. тест может остановиться на странице где нет меню для выхода, например модальное окно выбора организации
+    # Logout - use plain URL without credentials since we handle auth via headers now
+    browser.get('https://www.tnop12.rt.ru/logout')
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

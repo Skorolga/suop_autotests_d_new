@@ -1,0 +1,27 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "pytest": true,
+        "/^python -m pytest tests/subtest/iaas_smoke_test\\.py -vv -k test_iaas$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python -m pytest tests/subtest/iaas_smoke_test\\.py::test_iaas -vv -k test_iaas$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^powershell -Command \"Get-Item \\.\\\\wait_for_page_loaded_failure\\.png \\| Format-List \\*\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "&": true,
+        "type": true,
+        "/^& C:\\\\Users\\\\skoro\\\\suop_autotests_d_new\\\\\\.venv\\\\Scripts\\\\Activate\\.ps1; python -c \"import blinker, pkgutil; print\\(blinker\\.__file__\\); print\\(list\\(pkgutil\\.iter_modules\\(blinker\\.__path__\\)\\)\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^& C:\\\\Users\\\\skoro\\\\suop_autotests_d_new\\\\\\.venv\\\\Scripts\\\\Activate\\.ps1; pip install blinker==1\\.4$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
