@@ -28,6 +28,12 @@ def browser():
     # install and start chromedriver via webdriver-manager
     service = Service(ChromeDriverManager().install())
     browser = webdriver.Chrome(service=service, options=options)
+    browser.execute_cdp_cmd('Network.enable', {})
+    browser.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+        'headers': {
+            'Authorization': SUOP.BASIC_AUTH_HEADER,
+        }
+    })
     # browser.implicitly_wait(20)  # неявное ожидание (вместе с явным использовать не рекомендуется)
 
     yield browser

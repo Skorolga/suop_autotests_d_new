@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 from urllib.parse import quote
+import base64
 
 dotenv_path = Path('./.env')
 load_dotenv(dotenv_path=dotenv_path, override=True)
@@ -20,6 +21,9 @@ class SUOP:
         MAIN_URL = f'{protocol}://{BASIC_AUTH_LOGIN}:{ENCODED_PASSWORD}@{rest}'
     else:
         MAIN_URL = f'https://{BASIC_AUTH_LOGIN}:{ENCODED_PASSWORD}@{BASE_URL}'
+
+    BASIC_AUTH_TOKEN = base64.b64encode(f'{BASIC_AUTH_LOGIN}:{BASIC_AUTH_PASSWORD}'.encode('utf-8')).decode('utf-8')
+    BASIC_AUTH_HEADER = f'Basic {BASIC_AUTH_TOKEN}'
     
     # Остальные переменные
     CLIENT_LOGIN = os.getenv('CLIENT_LOGIN')
