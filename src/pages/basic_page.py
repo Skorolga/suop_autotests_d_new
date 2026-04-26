@@ -133,18 +133,31 @@ class BasicPage(object):
         """Набирает тест"""
         self.browser.find_element(*locator).send_keys(text)
 
-    def handle_basic_auth(self, login: str | None = None, password: str | None = None, timeout: int = 5):
-        """Обработка диалога базовой автентификации.
-        
-        Для Firefox: диалог открывается. Мы кликаем OK чтобы Firefox использовал
-        встроенные в URL учетные данные (https://user:pass@host).
+    def handle_basic_auth(self, timeout: int = 30):
+        """Ожидание ручного ввода basic auth и подтверждение входа.
+
+        Сценарий:
+        1) Открываем URL без credentials (окно basic auth пустое).
+        2) Пользователь вручную вводит логин/пароль.
+        3) Тест ждет timeout секунд.
+        4) Тест пытается нажать «Войти» (через alert.accept или Enter).
         """
+        logger.info(f'Ожидаем ручной ввод данных basic auth: {timeout} секунд')
+        time.sleep(timeout)
+
         try:
-            alert = WebDriverWait(self.browser, timeout).until(EC.alert_is_present())
-            alert.accept()  # кликаем OK для использования встроенных в URL учетных данных
-            logger.info('Basic auth dialog accepted')
+            alert = WebDriverWait(self.browser, 2).until(EC.alert_is_present())
+            alert.accept()
+            logger.info('Basic auth dialog accepted after manual input')
+            return
         except Exception:
-            pass  # если нет никакого алерта
+            logger.info('Selenium alert basic auth не найден, отправляем Enter в активное окно')
+
+        try:
+            send_keys('{ENTER}')
+            logger.info('Нажат Enter для подтверждения basic auth')
+        except Exception as error:
+            logger.warning(f'Не удалось подтвердить basic auth через Enter: {error}')
 
     def get_text(self, locator):
         elem = self.find_elem(locator)
@@ -162,5 +175,4 @@ class BasicPage(object):
                 elem.send_keys(Keys.BACKSPACE)
         except Exception as e:
             logger.warning('Не удалось очистить текстовое поле кастомным методом класса base_page')
-
 
