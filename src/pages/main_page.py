@@ -15,12 +15,11 @@ class MainPage(BasicPage):
             self.browser.get(url)
 
     def go_to(self, set_url):
-        # Navigate to URL with embedded credentials
-        # Chrome should handle basic auth transparently
+        # Открываем URL без credentials и ждем ручной basic auth.
         self.browser.get(set_url)
+        self.handle_basic_auth(timeout=30)
 
     def auth_main_page(self):
         """Функция авторизации через главную страницу"""
         self.click(self.LK_BUTTON)
-
 
